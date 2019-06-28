@@ -1,0 +1,26 @@
+page {
+  background: #F4F4F4;
+}
+.radio-group {
+  margin: 28rpx 0;
+  padding: 0 24rpx;
+}
+.radio-group > label {
+  width: 50%;
+  text-align: left;
+  display: inline-block;
+}
+.section {
+  padding: 0 24rpx;
+}
+.title {
+  font-size: 16px;
+  color: #999;
+}
+textarea {
+  width: 100%;
+  height: 210px;
+  border: 1px solid #ccc;
+  background: white;
+  font-size: 14px;
+}

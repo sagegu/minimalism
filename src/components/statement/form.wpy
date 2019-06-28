@@ -2,17 +2,26 @@
   <form bindsubmit="formSubmit" report-submit="true">
     <view class="container">
       <view class="column money">
-        <text>金额</text>
+        <text>{{ statement.category_name }}</text>
         <input class="money-input {{ statement.type }}" placeholder="0.00" placeholder-class="{{ statement.type }}" bindinput="handleAmountInput" name="amount" type="digit" value="{{ statement.amount }}"/>
       </view>
 
-      <view class="column" @tap="redirectChoseCategory">
-        <text>分类</text>
-        <text type="digit" class="align-right">{{ statement.category_name }}</text>
-        <input hidden name="category_id" value="{{ statement.category_id }}"/>
+      <view class="column-category" > 
+        <text @tap="chooseCategory({{ '吃喝' }})" >吃喝</text>
+        <text @tap="chooseCategory({{ '交通' }})" >交通</text>
+        <text @tap="chooseCategory({{ '买菜' }})" >买菜</text>
+        <text @tap="chooseCategory({{ '服饰鞋包' }})" >服饰鞋包</text>
+        <text @tap="chooseCategory({{ '化妆护肤' }})" >化妆护肤</text>
+      </view>
+      <view class="column" > 
+        <text @tap="chooseCategory({{ '日用品' }})" >日用品</text>
+        <text @tap="chooseCategory({{ '娱乐' }})" >娱乐</text>
+        <text @tap="chooseCategory({{ '宠物' }})" >宠物</text>
+        <text @tap="chooseCategory({{ '孩子' }})" >孩子</text>
+        <text @tap="chooseCategory({{ '其他' }})" >其他</text>
       </view>
 
-      <view class="frequent-use" wx:if="{{ categories_labels.length > 0 }}">
+     <!--  <view class="frequent-use" wx:if="{{ categories_labels.length > 0 }}">
         <text>猜你想用：</text>
         <text class="label" wx:for="{{ categories_labels }}" @tap="setCategory({{item}})">{{ item.name }}</text>
       </view>
@@ -26,7 +35,7 @@
       <view class="frequent-use" wx:if="{{ assets_labels.length > 0 }}">
         <text>猜你想用：</text>
         <text class="label" wx:for="{{ assets_labels }}" @tap="setAsset({{ item }})">{{ item.name }}</text>
-      </view>
+      </view> -->
       
       <view class="column">
         <text>日期</text>
@@ -42,39 +51,13 @@
         <text class="label" @tap="quickSetDate('-2')">前天</text>
         <text class="label" @tap="quickSetDate('-1')">昨天</text>
         <text class="label" @tap="quickSetDate('0')">今天</text>
-      </view>
-
-      <view class="column location-column">
-        <text style="flex: 1">地点</text>
-        <view>
-          <input name="location" type="text" value="{{ statement.address }}"/>
-          <switch checked="{{ switchCheck }}" bindchange="getLocation"/>
-
-          <input class="input-hidden" name="nation" value="{{ nation }}"/>
-          <input class="input-hidden" name="province" value="{{ province }}"/>
-          <input class="input-hidden" name="city" value="{{ city }}"/>
-          <input class="input-hidden" name="district" value="{{ district }}"/>
-          <input class="input-hidden" name="street" value="{{ street }}"/>
-        </view>
-      </view>
+      </view> 
       
       <view class="column">
         <text>备注</text>
         <input class="remark" type="text" name="description" bindinput="handleDescInput" value="{{ statement.description }}" placeholder="本笔账单的简单说明"/>
       </view>
-
-      <view class="upload-picture">
-        <view class="title">上传图片</view>
-        <view class="img-list">
-          <view class="image-item" @tap="uploadImage">
-            <image src="../../public/images/add-2.png"  lazy-load="false"></image>
-          </view>
-          <view class="image-item user-upload-item" wx:for="{{ statement.upload_files }}">
-            <image src="{{ item }}" @tap="showPicture('{{ item }}')" lazy-load="false"></image>
-            <view class="close" @tap="deleteImage('{{ item }}')">X</view>
-          </view>
-        </view>
-      </view>
+ 
 
       <view class="btn-save">
         <button wx:if="{{ !submiting }}" formType="submit">保存</button>
@@ -109,7 +92,7 @@ export default class StatementFormComponent extends wepy.component {
           date: '',
           address: '',
           time: '',
-          category_name: '请选择分类',
+          category_name: '吃喝',
           asset_name: '请选择账户',
           upload_files: []
         }
@@ -216,6 +199,10 @@ export default class StatementFormComponent extends wepy.component {
     setCategory (category) {
       this.statement.category_id = category.id
       this.statement.category_name = category.name
+    },
+    chooseCategory (category) {
+       //tip.toast(category)
+       this.statement.category_name = category
     },
     getLocation (e) {
       const locationSwitch = e.detail.value

@@ -3,7 +3,7 @@
 .wallet-header {
   height: 200rpx;
   position: relative;
-  background: linear-gradient(to right, rgb(242, 153, 74), rgb(242, 201, 76));
+  background: linear-gradient(to right, rgb(236, 100, 100), rgb(236, 150, 100));
   color: white;
   .header-container {
     position: absolute;
@@ -87,7 +87,8 @@
     .asset-header {
       display: flex;
       justify-content: space-between;
-      padding-top:8px;
+      padding-top:12px;
+      font-size: 10px;
     }
   }
 
@@ -100,8 +101,8 @@
   }
 
   .column {
-    height: 80rpx;
-    line-height: 80rpx;
+    height: 120rpx;
+    line-height: 120rpx;
     border-bottom:1px solid #efefef;
     &:last-child {
       .title, .money {
@@ -115,11 +116,11 @@
       flex-direction:column;
     }
     .title {
-      margin-left:56rpx;
-      font-size:16px;
+      margin-left:15rpx;
+      font-size:12px;
     }
     .money {
-      font-size:16px;
+      font-size:12px;
       text-align:right;
       color: $secondaryText;
     }

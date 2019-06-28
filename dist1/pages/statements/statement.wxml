@@ -1,0 +1,102 @@
+
+  <view class="tab"  wx:if="{{ !(type == 'transfer' && method == 'PUT') }}">
+    <view class="{{ type == 'expend' ? 'active' : '' }}" bindtap="choseTab" data-wpychosetab-a="expend">支出</view>
+    <view class="{{ type == 'income' ? 'active' : '' }}" bindtap="choseTab" data-wpychosetab-a="income">收入</view>
+    <view class="{{ type == 'transfer' ? 'active' : '' }}" bindtap="choseTab" data-wpychosetab-a="transfer">转账</view>
+  </view>
+  <form bindsubmit="formSubmit">
+    <!-- 收入/支出 -->
+    <view class="container"  wx:if="{{type == 'expend' || type == 'income'}}">
+      <view class="column money">
+        <text>金额</text>
+        <input class="money-input {{ type }}" placeholder="0.00" placeholder-class="{{ type }}" name="amount" type="digit" value="{{ amount }}"/>
+      </view>
+
+      <view class="column" bindtap="redirectChoseCategory">
+        <text>分类</text>
+        <text type="digit">{{ category_name }}</text>
+        <input hidden name="category_id" value="{{ category_id }}" type="number"/>
+      </view>
+
+      <view class="frequent-use" wx:if="{{ categories_label.length > 0 }}">
+        <text>猜你想用：</text>
+        <text class="label" wx:for="{{ categories_label }}" bindtap="tabCategory" data-wpytabcategory-a="{{item}}">{{ item.name }}</text>
+      </view>
+
+      <view class="column" bindtap="redirectChoseAsset">
+        <!-- 默认选中最常用的 -->
+        <text>账户</text>
+        <text>{{ asset_name }}</text>
+        <input hidden name="asset_id" value="{{ asset_id }}" type="number"/>
+      </view>
+
+      <view class="frequent-use" wx:if="{{ assets_label.length > 0 }}">
+        <text>猜你想用：</text>
+        <text class="label" wx:for="{{ assets_label }}" bindtap="tabAsset" data-wpytabasset-a="{{item}}">{{ item.name }}</text>
+      </view>
+      
+      <view class="column">
+        <text>日期</text>
+        <picker mode="date" start="2017-01-01" bindchange="dateChange">
+          <text>{{ date }}</text>
+        </picker>
+        <input hidden name="date" value="{{ date }}" type="number"/>
+      </view>
+
+      <view class="column location-column">
+        <text style="flex: 1">地理位置</text>
+        <view style="flex: 2">
+          <input name="location" type="text" value="{{ address }}"/>
+          <switch checked="{{ switchCheck }}" bindchange="getLocation"/>
+
+          <input class="input-hidden" name="nation" value="{{ nation }}"/>
+          <input class="input-hidden" name="province" value="{{ province }}"/>
+          <input class="input-hidden" name="city" value="{{ city }}"/>
+          <input class="input-hidden" name="district" value="{{ district }}"/>
+          <input class="input-hidden" name="street" value="{{ street }}"/>
+        </view>
+      </view>
+      
+      <view class="column">
+        <text>备注</text>
+        <input class="remark" type="text" name="description" value="{{ description }}" placeholder="本笔账单的简单说明"/>
+      </view>
+
+      <view class="zan-btns">
+        <button class="zan-btn ljt-btn" disabled="{{ submiting }}" formType="submit" bindtap="submit">保存</button>
+      </view>
+      <input hidden type="text" name="type" value="{{ type }}"/>
+    </view>
+
+    <!-- 转账 -->
+    <view class="container"  wx:if="{{ type == 'transfer' }}">
+      <view class="column money">
+        <text>金额</text>
+        <input class="money-input expend" placeholder="0.00" placeholder-class="{{ type }}" name="amount" type="digit" value="{{ amount }}"/>
+      </view>
+
+      <view class="column transfer-type">
+        <view bindtap="assetFrom">{{ source }}</view>
+        <image bindtap="exchangeAsset" class="transfer-icon" src="/public/images/transfer.png"/>
+        <view bindtap="assetTo">{{ target }}</view>
+      </view>
+
+      <view class="column">
+        <text>日期</text>
+        <picker mode="date" start="2017-01-01" bindchange="dateChange">
+          <text>{{ date }}</text>
+       </picker>
+        <input hidden name="date" value="{{ date }}" type="number"/>
+      </view>
+
+      <view class="column">
+        <text>备注</text>
+        <input class="pull-right remark" type="text" name="description" value="{{ description }}" placeholder="本笔账单的简单说明"/>
+      </view>
+
+      <view class="zan-btns">
+        <button class="zan-btn ljt-btn" formType="submit" disabled="{{ submiting }}" bindtap="submit">保存</button>
+      </view>
+    </view>
+
+  </form>

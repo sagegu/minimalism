@@ -11,7 +11,8 @@ page, .container{
 .header {
 	position:relative;
 	color:white;
-	height:380rpx;
+  background: #EC6464;
+	height:300rpx;
 	.bg {
     position:absolute;
     width:100%;
@@ -97,6 +98,7 @@ page, .container{
     }
   }
 }
+
 .no-more-data {
   text-align: center;
   color: #999;
@@ -105,3 +107,21 @@ page, .container{
   line-height: 60rpx;
   font-size: 28rpx;
 }
+
+.coupons-float {
+  position: fixed;
+  right:15rpx;
+  bottom:80rpx;
+  width:90rpx;
+  height:90rpx;
+  background-color: #fff;
+  text-align: center;
+  border-radius:50%;
+  border: 1rpx solid #ddd;
+ image {
+  width:60rpx;
+  height:60rpx;
+  margin-top: 10rpx;
+    }
+}
+ 

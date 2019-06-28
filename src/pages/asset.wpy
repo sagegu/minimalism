@@ -3,35 +3,35 @@
   <view class="wallet-header">
     <view class="header-container">
       <view class="netWorth">
-        <view>
+        <!-- <view>
           <text>净资产</text>
           <text
             @tap="eyesTab"
             class="iconfont eye-item-img {{ eyeImageClass }}"
           >
           </text>
-        </view>
-        <view>{{ hiddenMoney ? '****' : netWorth }}</view>
+        </view> -->
+        <view>极简星球邀你挑战</view>
       </view>
 
-      <view class="asset-and-debt">
+      <!-- <view class="asset-and-debt">
         <text>总资产 {{ hiddenMoney ? '****' : totalAssets }}</text>
         <text>|</text>
         <text>总负债 {{ hiddenMoney ? '****' : totalDebt }}</text>
-      </view>
+      </view> -->
     </view>
   </view>
 
   <view id="all-assets">
     <view class="asset" wx:for="{{ wallets }}">
       <view class="asset-header">
-        <text class="fs12">{{ item.name }}</text>
-        <text class="fs12">{{ hiddenMoney ? '****' : item.amount }}</text>
-      </view>
+        <text >{{ item.name }}</text>
+<!--         <text   class="title">{{ hiddenMoney ? '****' : item.amount }}</text>
+ -->      </view>
       <view class="column" wx:for="{{ item.childs }}" bindtap="showAsset('{{ item.id }}')">
-        <view class="icon pull-left">
+       <!--  <view class="icon pull-left">
           <image class="icon-small-size" src="{{ item.icon_path }}"></image>
-        </view>
+        </view> -->
         <view class="money pull-right">{{ hiddenMoney ? '****' : item.amount }}</view>
         <view class="title">{{ item.name }}</view>
       </view>
@@ -47,14 +47,18 @@
   import wxRequest from '@/utils/wxRequest'
   export default class Wallet extends wepy.page {
     config = {
-      navigationBarTitleText: '资产总览',
+      navigationBarTitleText: '挑战',
       "usingComponents": {
         "i-spin": "../public/iview/spin/index"
       }
     }
     
 		data = {
-    	wallets: [],
+    	wallets: [{name: "极简生活挑战", childs: [{id: 1, name: "一个月1000块", amount: 1000}, 
+                                        {id: 2, name: "一个月1500块", amount: 1000}]},
+                {name: "腹肌挑战", childs: [{id: 1, name: "3块腹肌", amount:  ""}, 
+                                        {id: 2, name: "六块腹肌", amount: ""}]}
+                                        ],
 			netWorth: '0.00',
 			totalAssets: '0.00',
 			totalDebt: '0.00',
@@ -65,7 +69,8 @@
 
     methods = {
       showAsset (id) {
-        wx.navigateTo({ url: `/pages/assets/asset_detail?id=${id}` })
+        // wx.navigateTo({ url: `/pages/assets/asset_detail?id=${id}` })
+        wx.navigateTo({ url: `/pages/index` })
       },
       async eyesTab () {
         this.$parent.globalData.user.hidden_asset_money = !this.$parent.globalData.user.hidden_asset_money
@@ -75,7 +80,7 @@
 
 		onShow () {
       if (Session.get('@asset_list_load_cache@')) {
-        this.wallets = Session.get('@asset_list_load_cache@')
+        // this.wallets = Session.get('@asset_list_load_cache@')
         this.$apply()
       }
 			this.getAssets()

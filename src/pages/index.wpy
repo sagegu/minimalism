@@ -8,7 +8,7 @@
         </view>
         <view class="fs21 today-expend">{{ header.position_1_amount }}</view>
         <view class="overflow-hide">
-          <view class="pull-left fs14">{{ header.position_2_human_name }} {{ header.position_2_amount }}</view>
+          <view class="pull-left fs14"  @tap="gotoChallenge">{{ header.position_2_human_name }} {{ header.position_2_amount }}</view>
           <view class="pull-right fs14">{{ header.position_3_human_name }} {{ header.position_3_amount }}</view>
         </view>
       </view>
@@ -21,11 +21,13 @@
       </i-notice-bar>
     </view>
     
-    <view class="zan-btns new-record">
+<!--     <view class="zan-btns new-record">
       <navigator url="/pages/statements/create">
         <button class="zan-btn jz-btn btn-shadow">记一笔</button>
       </navigator>
-    </view>
+    </view> -->
+
+ 
 
     <view class="statement-list" wx-if="{{ list.length > 0 }}">
       <repeat for="{{ list }}" key="index" index="index" item="item">
@@ -36,8 +38,12 @@
     <view wx:if="{{ list.length == 0 }}">
       <empty :title.sync="emptyTitle"></empty>
     </view>
-
   </view>
+
+     <view class="coupons-float" @tap="gotoCreate">
+      <image src="../public/images/edit.png"></image>
+    </view>
+
 </template>
 
 <script>
@@ -60,8 +66,10 @@
     data = {
       emptyTitle: '本周还没有开始记账哦~',
       orderEmptyTitle: '无预购清单，点击下方添加一笔吧',
-      list: [],
-      header: {}
+     
+      list: [ {id: '1', description: '今天很能花', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'},
+             {id: '1', description: '雪顶咖啡', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'}  ],
+      header: {position_1_human_name: "总支出", position_1_amount: "998", position_2_human_name: "挑战组1-挑战金额", position_2_amount: "1000", position_3_human_name:"挑战预算结余", position_3_amount: "2" }
     }
 
     components = {
@@ -73,6 +81,15 @@
     onShow () {
       this.getHeader()
       this.getList()
+    }
+
+    methods = {
+      gotoCreate () {
+        wx.navigateTo({ url: "/pages/statements/create" })
+      },
+      gotoChallenge () {
+        wx.navigateTo({ url: "/pages/asset" })
+      }
     }
 
     async getHeader () {

@@ -19,16 +19,33 @@ page {
     justify-content: space-between;
     > text {
       min-width:100rpx;
-      &:last-child {
-        color: $secondaryText;
-      }
+       
     }
     .remark {
       height:120rpx !important;
       line-height: 120rpx !important;
       text-align: right;
     }
+ 
+
   }
+
+  > .column-category {
+    height: 100rpx;
+    line-height: 100rpx;
+    padding:0 24rpx;
+    border-bottom: 0px solid #efefef;
+    font-size: 28rpx;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    > text {
+      min-width:100rpx;
+       
+    }
+   
+  }
+
   > .upload-picture {
     padding:0 24rpx;
     background: white;

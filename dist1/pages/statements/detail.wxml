@@ -1,0 +1,82 @@
+
+  <view>
+    <view class="container">
+      <view class="title">
+        <view>
+          <image class="icon" src="{{ statement.category_icon }}"/>
+          <text>{{ statement.title_category }}</text>
+        </view>
+        <text class="{{statement.type}}">{{ statement.type == 'expend' ? '-' : '+' }} {{ statement.amount }}</text>
+      </view>
+
+      <view class="column">
+        <view>
+          <view class="iconfont jz-icon-fenlei"/>
+          <text>分类</text>
+        </view>
+        <text>{{ statement.category }}</text>
+      </view>
+
+      <view class="column">
+        <view>
+          <view class="iconfont jz-icon-qianbao"/>
+          <text>账户</text>
+        </view>
+        <text>{{ statement.asset }}</text>
+      </view>
+
+      <view class="column">
+        <view>
+          <view class="iconfont jz-icon-50"/>
+          <text>使用后账户余额</text>
+        </view>
+        <text>{{ statement.residue }}</text>
+      </view>
+
+      <view class="column">
+        <view>
+          <view class="iconfont jz-icon-shijian"/>
+          <text>时间</text>
+        </view>
+        <text>{{ statement.time }}</text>
+      </view>
+
+      <view class="column"  wx:if="{{ statement.location != null && statement.location != '' }}">
+        <view>
+          <view class="iconfont jz-icon-address"/>
+          <text>坐标</text>
+        </view>
+        <text>{{ statement.location }}</text>
+      </view>
+
+      <view class="column"  wx:if="{{ statement.description != null && statement.description != '' }}">
+        <view>
+          <view class="iconfont jz-icon-remark"/>
+          <text>描述</text>
+        </view>
+        <text>{{ statement.description }}</text>
+      </view>
+
+      <view class="statement-files" wx-if="{{ statement.upload_files.length > 0 }}">
+        <view>
+          <text>关联图片</text>
+        </view>
+        <view class="image-list">
+          <view class="image-item" wx:for="{{ statement.upload_files }}">
+            <image src="{{ item }}" bindtap="showPicture" lazy-load="false" data-wpyshowpicture-a="{{ item }}"/>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="button-groups">
+      <view class="delete-button" bindtap="del">
+        <view class="iconfont jz-icon-delete"/>
+        <text>删除</text>
+      </view>
+      <view class="edit-button" bindtap="edit">
+        <view class="iconfont jz-icon-edit"/>
+        <text>编辑</text>
+      </view>
+    </view>
+  </view>

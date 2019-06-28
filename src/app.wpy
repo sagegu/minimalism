@@ -12,9 +12,9 @@ export default class extends wepy.app {
   config = {
     pages: [
       "pages/index",
-      "pages/chart",
+      // "pages/chart",
       "pages/asset",
-      "pages/setting",
+      // "pages/setting",
 
       // 记一笔
       "pages/statements/create",
@@ -22,27 +22,27 @@ export default class extends wepy.app {
       "pages/statements/detail",
       "pages/statements/chose_category",
       "pages/statements/chose_asset",
-      "pages/statements/filter_statements",
+      // "pages/statements/filter_statements",
 
       // 余额设置
-      "pages/forms/asset_form",
-      "pages/forms/budget_form",
-      "pages/forms/icons_chose",
+      // "pages/forms/asset_form",
+      // "pages/forms/budget_form",
+      // "pages/forms/icons_chose",
 
       // 预算
-      "pages/budgets/budget",
-      "pages/budgets/child_budget",
+      // "pages/budgets/budget",
+      // "pages/budgets/child_budget",
 
       // 设置
-      "pages/settings/feedback",
-      "pages/settings/header",
-      "pages/settings/super_chart",
-      "pages/settings/user_info",
-      "pages/settings/nickname_edit",
-      "pages/settings/prepare_buy",
-      "pages/settings/super_statement",
-      "pages/settings/about",
-      "pages/settings/search",
+      // "pages/settings/feedback",
+      // "pages/settings/header",
+      // "pages/settings/super_chart",
+      // "pages/settings/user_info",
+      // "pages/settings/nickname_edit",
+      // "pages/settings/prepare_buy",
+      // "pages/settings/super_statement",
+      // "pages/settings/about",
+      // "pages/settings/search",
 
       // 账单墙
       "pages/statements/images",
@@ -57,15 +57,15 @@ export default class extends wepy.app {
       "pages/assets/asset_detail",
       
       // 消息
-      "pages/message",
-      "pages/message/detail",
+      // "pages/message",
+      // "pages/message/detail",
 
       // 月账单
-      "pages/months/index",
+      // "pages/months/index",
 
       // 好友
-      "pages/friends/index",
-      "pages/friends/search"
+      // "pages/friends/index",
+      // "pages/friends/search"
     ],
     window: {
       "backgroundColor": "#efefef",
@@ -76,37 +76,37 @@ export default class extends wepy.app {
       // navigationBarTextStyle: "white",
       "enablePullDownRefresh": false
     },
-    tabBar: {
-      backgroundColor: "#fff",
-      color: "#000000",
-      selectedColor: "#2196F3",
-      list: [
-        {
-          pagePath: "pages/index",
-          iconPath: "public/images/settings/statement.png",
-          selectedIconPath: "public/images/settings/statement-active.png",
-          text: "首页"
-        },
-        {
-          pagePath: "pages/chart",
-          iconPath: "public/images/settings/statistic.png",
-          selectedIconPath: "public/images/settings/statistic-active.png",
-          text: "统计"
-        },
-        {
-          pagePath: "pages/asset",
-          iconPath: "public/images/settings/asset.png",
-          selectedIconPath: "public/images/settings/asset-active.png",
-          text: "资产"
-        },
-        {
-          pagePath: "pages/setting",
-          iconPath: "public/images/settings/user_1.png",
-          selectedIconPath: "public/images/settings/user_1-active.png",
-          text: "我的"
-        }
-      ]
-    },
+    // tabBar: {
+    //   backgroundColor: "#fff",
+    //   color: "#000000",
+    //   selectedColor: "#2196F3",
+    //   list: [
+    //     {
+    //       pagePath: "pages/index",
+    //       iconPath: "public/images/settings/statement.png",
+    //       selectedIconPath: "public/images/settings/statement-active.png",
+    //       text: "首页"
+    //     },
+    //     {
+    //       pagePath: "pages/chart",
+    //       iconPath: "public/images/settings/statistic.png",
+    //       selectedIconPath: "public/images/settings/statistic-active.png",
+    //       text: "统计"
+    //     },
+    //     {
+    //       pagePath: "pages/asset",
+    //       iconPath: "public/images/settings/asset.png",
+    //       selectedIconPath: "public/images/settings/asset-active.png",
+    //       text: "资产"
+    //     },
+    //     {
+    //       pagePath: "pages/setting",
+    //       iconPath: "public/images/settings/user_1.png",
+    //       selectedIconPath: "public/images/settings/user_1-active.png",
+    //       text: "我的"
+    //     }
+    //   ]
+    // },
     networkTimeout: {
       request: 100000,
       downloadFile: 100000
@@ -117,12 +117,7 @@ export default class extends wepy.app {
       }
     },
     debug: false,
-    "plugins": {
-      "calendar": {
-        "version": "1.1.3",
-        "provider": "wx92c68dae5a8bb046"
-      }
-    }
+     
   }
   
   globalData = {

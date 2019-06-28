@@ -1,0 +1,42 @@
+
+  <view class="container">
+    <view class="header">
+      <view class="level-2">
+        <view class="fs14">
+          <text>本月{{ categoryText }}</text>
+        </view>
+        <view class="fs21 today-expend">{{ header.month }}</view>
+        <view class="overflow-hide">
+          <view class="pull-left fs14">本年{{ categoryText }} {{ header.year }}</view>
+          <view class="pull-right fs14">全年{{ categoryText }} {{ header.all }}</view>
+        </view>
+      </view>
+
+      <view class="btn-new">
+        <navigator url="/pages/categories/category_form?type={{ type }}&parent_id={{ parent_id }}">
+          + 新增分类
+        </navigator>
+      </view>
+    </view>
+
+    <view class="list">
+      <view class="item"  wx:for="{{ categories }}" bindtap="redirect_url" data-wpyredirect_url-a="{{ item.id }}">
+        <view class="icon-name">
+          <image class="ljt-icon" src="{{ host }}{{ item.icon_path }}"/>
+          <text class="category-name">{{ item.name }}</text>
+        </view>
+        <text class="{{ type }}">{{ item.amount }}</text>
+      </view>
+    </view>
+
+    <view class="button-groups">
+      <view class="delete-button" bindtap="del">
+        <view class="iconfont jz-icon-delete"/>
+        <text>删除</text>
+      </view>
+      <view class="edit-button" bindtap="edit">
+        <view class="iconfont jz-icon-edit"/>
+        <text>编辑</text>
+      </view>
+    </view>
+  </view>

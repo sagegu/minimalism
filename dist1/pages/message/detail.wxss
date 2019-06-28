@@ -1,0 +1,19 @@
+@import "./../../components/htmlparse.wxss";
+.container {
+  height: 100%;
+  padding: 12px 24px;
+}
+.container > .title {
+  font-size: 26px;
+}
+.container > .time {
+  font-size: 16px;
+  color: #757575;
+  margin-top: 8px;
+}
+.container > .time > text {
+  margin-right: 8px;
+}
+.container .content {
+  margin-top: 8px;
+}

@@ -1,0 +1,37 @@
+
+  <view class="category-component">
+    <view  wx:if="{{ frequent.length > 0 }}">
+      <view class="header fs14">常用</view>
+      <block wx:for="{{frequent}}" wx:for-index="index" wx:for-item="child" wx:key="index">
+        
+  <view class="column" bindtap="$category$choseCategory" data-com-index="{{index}}" data-wpychosecategory-a="{{ child }}">
+    <view class="category">
+      <image class="ljt-icon" src="{{ child.icon_path }}"/>
+      <text class="category-name fs16">{{ child.name }}</text>
+    </view>
+  </view>
+
+      </block>
+    </view>
+
+    <view  wx:for="{{ list }}">
+      <view class="header fs14">{{ item.name }}</view>
+      <block wx:for="{{item.childs}}" wx:for-index="index" wx:for-item="child" wx:key="index">
+        
+  <view class="column" bindtap="$category$choseCategory" data-com-index="{{index}}" data-wpychosecategory-a="{{ child }}">
+    <view class="category">
+      <image class="ljt-icon" src="{{ child.icon_path }}"/>
+      <text class="category-name fs16">{{ child.name }}</text>
+    </view>
+  </view>
+
+      </block>
+    </view>
+
+    <navigator url="/pages/categories/category_form?type={{ type }}">
+      <view class="add-wallet">
+        <image src="../../public/images/wallet-add.png"/>
+        <text class="fs16">添加分类</text>
+      </view>
+    </navigator>
+  </view>

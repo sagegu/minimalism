@@ -1,0 +1,1 @@
+.container{padding:0 24rpx}.container>.column{height:120rpx;border-bottom:1px solid #efefef;font-size:32rpx;background:white;display:flex;justify-content:space-between;align-items:center}.container>.column input{text-align:right}.container .textarea{font-size:14px;border-bottom:1px solid #f4f4f4}.container textarea{width:100%}

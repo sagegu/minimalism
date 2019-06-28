@@ -1,0 +1,42 @@
+
+  <view class="container">
+
+    <view class="parent">
+      <view class="budget-info" bindtap="showAmount" data-wpyshowamount-a="{{ budget.id }}" data-wpyshowamount-b="{{ budget.source_amount }}">
+        <view class="left"><image src="{{ budget.icon_path }}"/></view>
+        <view class="right">
+          <view class="title">
+            <text class="fs16 pull-left">{{ budget.name }}</text>
+            <text class="balance pull-right fs14">可用余额 {{ budget.surplus }}</text>
+          </view>
+          <!-- 进度条 -->
+          <view class="progress">
+            <view class="orange" style="width: {{ budget.use_percent }}%;"/>
+            <view class="gray" style="width: {{ budget.surplus_percent }}%;"/>
+          </view>
+
+          <view class="fs12 budget-amount">支出预算 {{ amount }}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="child">
+      <view class="budget-info"  wx:for="{{ childs }}" bindtap="showAmount" data-wpyshowamount-a="{{ item.id }}" data-wpyshowamount-b="{{ item.source_amount }}">
+        <view class="left"><image src="{{ item.icon_path }}"/></view>
+        <view class="right">
+          <view class="title">
+            <text class="fs16 pull-left">{{ item.name }}</text>
+            <text class="balance pull-right fs14">可用余额 {{ item.surplus }}</text>
+          </view>
+          
+         <!-- 进度条 -->
+          <view class="progress">
+            <view class="orange" style="width: {{ item.use_percent }}%;"/>
+            <view class="gray" style="width: {{ item.surplus_percent }}%;"/>
+          </view>
+
+          <view class="fs12 budget-amount">支出预算 {{ item.amount }}</view>
+        </view>
+      </view>
+    </view>
+  </view>

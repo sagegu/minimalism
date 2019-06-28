@@ -1,0 +1,77 @@
+
+<view class="container">
+  <view class="header">
+    <view class="amount">
+      <text bindtap="showAmountModal">
+        <text>{{ amount }}</text>
+        <text class="iconfont jz-icon-edit"/>
+      </text>
+      <navigator url="/pages/statements/create?type=transfer&asset_id={{ asset_id }}&source={{ header.name }}" class="btn transfer-btn">
+        转账
+      </navigator>
+    </view>
+    <view class="subtitle">余额</view>
+  </view>
+  <view class="surplus">
+    <view class="all-income income">收入： {{ header.income }}</view>
+    <view class="all-expend expend">支出： {{ header.expend }}</view>
+  </view>
+
+
+  <view id="all-assets"  wx:if="{{ !showEmpty }}">
+    <view class="content">
+      <view wx:for="{{ list }}">
+        <!-- header -->
+        <view class="column" bindtap="getList" data-wpygetlist-a="{{ item.year }}" data-wpygetlist-b="{{ item.month }}" data-wpygetlist-c="{{ index }}">
+          <view class="two-column">
+            <view class="time align-right">
+              <text>{{ item.month }}月</text>
+              <text>{{ item.year }}年</text>
+            </view>
+            <view class="amount">
+              <text class="income">收入： {{ item.income_amount }}</text>
+              <text class="expend">支出： {{ item.expend_amount }}</text>
+            </view>
+          </view>
+          <view class="left-amount align-right">
+            <view>
+              <view>{{ item.surplus }}</view>
+              <view>结余</view>
+            </view>
+            <text class="iconfont jz-icon-arrow-down-copy" wx:if="{{ item.hidden }}"/>
+            <text class="iconfont jz-icon-arrow-up" wx:else/>
+          </view>
+        </view>
+        <!-- list -->
+        <block wx:if="{{ !item.hidden }}" wx:for="{{ item.childs }}" wx:for-index="index" wx:for-item="st" wx:key="index">
+          
+  <view class="statement" bindtap="$statement$statement" data-com-index="{{index}}" data-wpystatement-a="id" data-wpystatement-b="{{ st.id }}">
+    <view class="information">
+      <!-- <view class="icon">
+        <image src="{{ statement.icon_path }}"></image>
+      </view> -->
+      <view class="st-title">
+        <view class="title">{{ st.category }}</view>
+        <!-- <view class="description" wx:if="{{statement.description}}">{{ statement.description }}</view> -->
+        <view class="time">{{ st.timeStr }} · {{ st.description }} · {{ st.asset }}</view>
+      </view>
+    </view>
+    <view class="amount {{ st.type }}">
+      {{ st.money }}
+    </view>
+  </view>
+
+        </block>
+      </view>
+    </view>
+  </view>
+
+  <view  wx:else>
+    
+  <view class="empty">
+    <view class="iconfont jz-icon-nomoredata empty-no-more"/>
+    <view class="title fs14">{{ $empty$title }}</view>
+  </view>
+
+  </view>
+</view>

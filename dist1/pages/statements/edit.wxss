@@ -1,0 +1,3 @@
+@import "./../../components/statement/repayment.wxss";
+@import "./../../components/statement/transfer.wxss";
+@import "./../../components/statement/form.wxss";

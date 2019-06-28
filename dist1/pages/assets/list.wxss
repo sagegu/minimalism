@@ -1,0 +1,18 @@
+@import "./../../components/category_list.wxss";
+.add-wallet {
+  text-align: center;
+  color: #999;
+  padding: 24rpx 0;
+}
+.add-wallet > view {
+  height: 100%;
+  vertical-align: center;
+  display: inline-block;
+}
+.add-wallet image {
+  width: 50rpx;
+  height: 50rpx;
+  display: inline-block;
+  margin-right: 8rpx;
+  vertical-align: middle;
+}

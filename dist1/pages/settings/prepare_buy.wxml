@@ -1,0 +1,75 @@
+
+  <view class="container">
+    <view class="list">
+      <block wx:for="{{ goods }}" wx:for-index="index" wx:for-item="item" wx:key="index">
+        
+  <view class="preorder-item _1565e6c" bindtap="$orderItem$getGood" data-com-index="{{index}}" data-wpygetgood-a="{{ item.id }}">
+    <image src="{{ item.header_image_url }}" class="_1565e6c"/>
+      <view class="goods _1565e6c">
+        <view class="title {{ item.state == 'bought' ? 'line-through' : '' }} _1565e6c">
+          <text class="_1565e6c">{{ item.name }}</text>
+          <text class="expend _1565e6c">{{ item.amount }}</text>
+        </view>
+        <view class="description _1565e6c">{{ item.remark }}</view>
+        <view class="address _1565e6c"  wx:if="{{ item.address != $orderItem$null && item.address != '' }}">
+          <view class="iconfont jz-icon-address _1565e6c"/>{{ item.address }}</view>
+        <view class="time-and-money _1565e6c">
+          <text class="_1565e6c">{{ item.created_at }}</text>
+        </view>
+      </view>
+  </view>
+      </block>
+
+      <view class="tips"  wx:if="{{ goods.length == 0 }}">
+        你可以把你需要购买的商品添加到这里哦，点击下方体验一下吧
+      </view>
+
+      <view class="total-tips"  wx:if="{{ goods.length > 0 }}">共 {{ goods.length }} 件预购商品</view>
+    </view>
+
+    <view bindtap="showCreateModal" class="footer" data-wpyshowcreatemodal-a="">
+      新增预购商品
+    </view>
+
+    
+  <view class="prepare_buy_item" catchtap="$Item$hideForm"  wx:if="{{ $Item$showModal }}" data-wpyhideform-a="">
+    <form bindsubmit="$Item$formSubmit">
+      <view class="form" catchtap="$Item$captchEvent" data-wpycaptchevent-a="">
+        <view class="item">
+          <view class="title">商品名称</view>
+          <input placeholder="商品名称" value="{{ $Item$good.name }}" name="name"/>
+        </view>
+
+        <view class="item">
+          <view class="title">金额</view>
+          <input placeholder="0.00" value="{{ $Item$good.amount }}" name="amount" type="digit"/>
+        </view>
+
+        <view class="item">
+          <view class="title">地址</view>
+          <input placeholder="购买地址" value="{{ $Item$good.address }}" name="address"/>
+        </view>
+
+        <view class="textarea">
+          <textarea placeholder="填写备注" value="{{ $Item$good.remark }}" name="remark"/>
+        </view>
+
+        <view class="zan-btns">
+          <button class="zan-btn ljt-btn" formType="submit">保存</button>
+        </view>
+
+        <view class="zan-btns" wx:if="{{ $Item$good.id != $Item$null }}">
+          <button class="zan-btn ljt-btn already-buy" catchtap="$Item$alreadyBuy" data-wpyalreadybuy-a="">
+            <text wx:if="{{ $Item$good.state == 'pending' }}">已购</text>
+            <text wx:else>重置状态</text>
+          </button>
+          <button wx:if="{{ $Item$showDelteBtn }}" class="zan-btn ljt-btn delete" bindtap="$Item$deleteItem" data-wpydeleteitem-a="">删除</button>
+        </view>
+
+        <input hidden value="{{ $Item$good.id }}" name="id"/>
+      </view>
+    </form>
+    <!-- <view class="close-tips">点击空白处关闭</view> -->
+  </view>
+
+  </view>

@@ -1,0 +1,22 @@
+
+  <view class="container">
+    <block wx:for="{{ list }}" wx:for-index="index" wx:for-item="st" wx:key="index">
+      
+  <view class="statement" bindtap="$statement$statement" data-com-index="{{index}}" data-wpystatement-a="id" data-wpystatement-b="{{ st.id }}">
+    <view class="information">
+      <!-- <view class="icon">
+        <image src="{{ statement.icon_path }}"></image>
+      </view> -->
+      <view class="st-title">
+        <view class="title">{{ st.category }}</view>
+        <!-- <view class="description" wx:if="{{statement.description}}">{{ statement.description }}</view> -->
+        <view class="time">{{ st.timeStr }} · {{ st.description }} · {{ st.asset }}</view>
+      </view>
+    </view>
+    <view class="amount {{ st.type }}">
+      {{ st.money }}
+    </view>
+  </view>
+
+    </block>
+  </view>

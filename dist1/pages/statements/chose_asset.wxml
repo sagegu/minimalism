@@ -1,0 +1,32 @@
+
+  <view class="category-component">
+    <view  wx:if="{{ !hide_frequent && frequent.length > 0 }}">
+      <view class="header fs14">常用</view>
+      <view class="column" wx:for="{{ frequent }}" bindtap="setAsset" data-wpysetasset-a="{{ item }}">
+        <view class="category">
+          <image class="ljt-icon" src="{{ item.icon_path }}"/>
+          <text class="category-name fs16">{{ item.name }}</text>
+          <text class="money">（¥{{ item.amount }}）</text>
+        </view>
+      </view>
+    </view>
+
+    <view  wx:for="{{ list }}">
+      <view class="header fs14">{{ item.name }}</view>
+      <view class="column" wx:for="{{ item.childs }}" bindtap="setAsset" data-wpysetasset-a="{{ item }}">
+        <view class="category">
+          <image class="ljt-icon" src="{{ item.icon_path }}"/>
+          <text class="category-name fs16">{{ item.name }}</text>
+          <text class="money">（¥{{ item.amount }}）</text>
+        </view>
+      </view>
+    </view>
+
+    <navigator url="/pages/assets/asset_form">
+      <view class="add-wallet">
+        <image src="../../public/images/wallet-add.png"/>
+        <text class="fs16" bindtap="newAsset">添加资产类型</text>
+      </view>
+    </navigator>
+
+  </view>

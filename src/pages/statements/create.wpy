@@ -1,14 +1,14 @@
 <template lang="wxml">
   <view class="container">
-    <i-tabs current="{{ current }}" bindchange="handleChange">
+   <!-- <i-tabs current="{{ current }}" bindchange="handleChange">
       <i-tab key="expend" title="支出"></i-tab>
       <i-tab key="income" title="收入"></i-tab>
-      <i-tab key="transfer" title="转账"></i-tab>
-      <i-tab key="repayment" title="还款"></i-tab>
+       <i-tab key="transfer" title="转账"></i-tab>
+      <i-tab key="repayment" title="还款"></i-tab> -->
       <!-- <i-tab key="payForOther" title="代付"></i-tab> -->
-      <!-- <i-tab key="receivable" title="应收"></i-tab> -->
+      <!-- <i-tab key="receivable" title="应收"></i-tab> 
     </i-tabs>
-    
+    -->
     <view class="comonent-list">
       <Expend
         :submiting.sync="submiting"
@@ -16,6 +16,7 @@
         @submit.user="submit"
         wx:if="{{ current == 'expend' }}"
       />
+
 
       <Income
         :submiting.sync="submiting"

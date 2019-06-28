@@ -1,0 +1,18 @@
+
+  <view class="container">
+    <view class="title">{{ title }}</view>
+    <view class="time">
+      <text>{{ msg_type }}</text>
+      <text>{{ time }}</text>
+    </view>
+    <view class="content">
+      
+  <view>
+    <import src="/utils/wxparse/wxParse.wxml"/>
+    <block  wx:for="{{ $htmlParser$htmlParserTpl.nodes }}" wx:key="{{index}}">
+      <template is="wxParse0" data="{{ item }}"/>
+    </block>
+  </view>
+
+    </view>
+  </view>

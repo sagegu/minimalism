@@ -1,0 +1,72 @@
+
+<view class="container">
+	<view class="calendar">
+		<calendar show-more-days="{{ false }}" lunar="{{ false }}" weeks-type="cn" cell-size="30" calendar-style="calendar-main" header-style="calendar-header" board-style="calendar-board" days-color="{{daySelect}}" bindprevMonth="monthChange" bindnextMonth="monthChange" binddayClick="dayClick"/>
+	</view>
+
+	<view class="ljt-tab fs16">
+		<view class="time">{{ monthAndDay }}</view>
+		<view class="{{ tabActive == 'single' ? 'active' : '' }}" bindtap="changeTab" data-wpychangetab-a="single">单笔明细</view>
+		<view class="{{ tabActive == 'category' ? 'active' : '' }}" bindtap="changeTab" data-wpychangetab-a="category">分类明细</view>
+	</view>
+
+  <view class="assets">
+    <view hidden="{{ tabActive == 'category' || singleList.length == 0 }}">
+			<view class="left-amount">
+				<text class="income income-border">收入: {{ singleData.surplus.income }}</text>
+				<text class="expend expend-border">支出: {{ singleData.surplus.expend }}</text>
+				<text class="surplus surplus-border">结余: {{ singleData.surplus.surplus }}</text>
+			</view>
+
+			<view class="tiaomu"  wx:for="{{ singleData.list }}" bindtap="showStatement" data-wpyshowstatement-a="{{ item.id }}">
+				<view class="information">
+					<image src="{{ item.category_icon }}"/>
+					<view class="title">
+						<view class="fs14">{{ item.category }}</view>
+						<view class="fs12 description" wx:if="{{ item.description != null }}">{{ item.description }}</view>
+						<view class="col999 fs12">{{ item.created_at }} · {{ item.wallet }}</view>
+					</view>
+				</view>
+
+				<view class="money {{ item.type }}">{{ item.amount }}</view>
+			</view>
+    </view>
+
+		<view class="mutiple" hidden="{{ tabActive == 'single' || mutipleData.length == 0 }}">
+			<view  wx:for="{{ mutipleData }}" bindtap="getCategoryList" data-wpygetcategorylist-a="{{ item.id }}" data-wpygetcategorylist-b="{{ index }}">
+				<view class="parent-node">
+					<view class="title">{{ item.name }}</view>
+					<view class="iconfont jz-icon-arrow-down-copy" wx:if="{{ item.hidden }}"/>
+					<view class="iconfont jz-icon-arrow-up" wx:else/>
+				</view>
+
+				<block wx:if="{{ !item.hidden }}" wx:for="{{ item.childs }}" wx:for-index="index" wx:for-item="st" wx:key="index">
+          
+  <view class="statement" bindtap="$statement$statement" data-com-index="{{index}}" data-wpystatement-a="id" data-wpystatement-b="{{ st.id }}">
+    <view class="information">
+      <!-- <view class="icon">
+        <image src="{{ statement.icon_path }}"></image>
+      </view> -->
+      <view class="st-title">
+        <view class="title">{{ st.category }}</view>
+        <!-- <view class="description" wx:if="{{statement.description}}">{{ statement.description }}</view> -->
+        <view class="time">{{ st.timeStr }} · {{ st.description }} · {{ st.asset }}</view>
+      </view>
+    </view>
+    <view class="amount {{ st.type }}">
+      {{ st.money }}
+    </view>
+  </view>
+
+        </block>
+			</view>
+		</view>
+
+		
+  <view class="empty" hidden="{{ singleList.length > 0 }}">
+    <view class="iconfont jz-icon-nomoredata empty-no-more"/>
+    <view class="title fs14">{{ $empty$title }}</view>
+  </view>
+
+  </view>
+</view>

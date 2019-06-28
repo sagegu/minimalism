@@ -1,0 +1,23 @@
+
+  <view class="container">
+    
+  <view  wx:for="{{ $List$list }}">
+    <navigator class="category parent-category" url="{{ $List$editUrl }}?id={{ item.id }}&type={{ $List$type }}">
+      <text class="category-name">{{ item.name }}</text>
+    </navigator>
+
+    <navigator class="category child-category" wx:for="{{ item.childs }}" wx:for-item="child" url="{{ $List$editUrl }}?id={{ child.id }}&type={{ $List$type }}">
+      <view class="image">
+        <image class="ljt-icon" src="{{ child.icon_url }}"/>
+      </view>
+      <text class="category-name">{{ child.name }}</text>
+    </navigator>
+  </view>
+
+    <navigator class="add-wallet" url="/pages/assets/asset_form">
+      <view>
+        <image src="../../public/images/wallet-add.png"/>
+      </view>
+      <text class="fs16" bindtap="newAsset">添加资产类型</text>
+    </navigator>
+  </view>

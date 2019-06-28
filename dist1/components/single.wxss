@@ -1,0 +1,50 @@
+.tiaomu {
+  height: 120rpx;
+  padding-left: 12rpx;
+  padding-right: 24rpx;
+  overflow: hidden;
+  border-bottom: 2rpx solid #efefef;
+}
+.tiaomu .money {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 120rpx;
+}
+.tiaomu .date-time {
+  width: 84rpx;
+  height: 120rpx;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+.tiaomu .information {
+  overflow: hidden;
+  height: 120rpx;
+  margin-left: 84rpx;
+}
+.tiaomu .information .title {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 120rpx;
+}
+.tiaomu .information .title .time {
+  color: #999;
+  font-size: 24rpx;
+}
+.tiaomu .information .description {
+  color: #999;
+}
+.tiaomu .information .icon {
+  height: 120rpx;
+  margin: 0 16rpx;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+.tiaomu .information .icon image {
+  width: 70rpx;
+  height: 70rpx;
+}
