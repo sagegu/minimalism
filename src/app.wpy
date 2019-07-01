@@ -25,7 +25,7 @@ export default class extends wepy.app {
       // "pages/statements/filter_statements",
 
       // 余额设置
-      // "pages/forms/asset_form",
+       "pages/forms/asset_form",
       // "pages/forms/budget_form",
       // "pages/forms/icons_chose",
 
@@ -34,7 +34,7 @@ export default class extends wepy.app {
       // "pages/budgets/child_budget",
 
       // 设置
-      // "pages/settings/feedback",
+       // "pages/settings/feedback",
       // "pages/settings/header",
       // "pages/settings/super_chart",
       // "pages/settings/user_info",
@@ -121,13 +121,14 @@ export default class extends wepy.app {
   }
   
   globalData = {
-    user: {}
+    user: {},
   }
 
   onLaunch () {
-    this.getUser()
+    // this.getUser()
     // this.checkVersionUpdate()
-    this.uploadData()
+    // this.uploadData()
+    this.postUser()
   }
 
   // 预加载用户
@@ -135,6 +136,96 @@ export default class extends wepy.app {
     const data = await wxRequest.Get('users')
     if (typeof data !== 'undefined') {
       this.globalData.user = data
+      console.log('++++++++')
+      console.log(data)
+    } else {
+      console.log('++++++++')
+      console.log(data)
+    }
+
+
+  }
+
+   // 预加载用户
+  async postUser() {  
+    const wxLogin =  wepy.login().then((loginResponse) => {
+      console.log('login code record is ++++++++', loginResponse)
+      wepy.getUserInfo().then((response) => {  
+          this.globalData.user = response.userInfo
+          response.userInfo['js_code'] = loginResponse.code
+
+          console.log('$$$$$$response.userInfo', this.globalData.user)
+
+          this.login()
+      }) 
+    })   
+  }
+
+  async login() {
+
+      var city = this.globalData.user['city']
+      if (city.length == 0) {
+        city = 'a city'
+      }
+      var province = this.globalData.user['province']
+      if (province.length == 0) {
+        province = 'a province'
+      }
+      var country = this.globalData.user['country']
+      if (country.length == 0) {
+        country = 'a country'
+      }
+      var language = this.globalData.user['language']
+      if (language.length == 0) {
+        language = 'a language'
+      }
+      const data = await wxRequest.Post('simple-wechat-login/', {
+                'js_code': this.globalData.user['js_code'],
+                 'avatar_url': this.globalData.user['avatarUrl'],
+                 'nick_name': this.globalData.user['nickName'],
+                 'city': city,
+                 'province': province,
+                 'country': country,
+                 'gender': this.globalData.user['gender'],
+                 'language': language})
+
+      if (typeof data !== 'undefined') {
+
+        this.globalData.user = data
+
+        Session.set('access', data.access)
+
+        // console.log('login SUCCESS the data is ++++++++', data)
+
+        // this.addRecord()
+        // this.listRecord()
+
+      } else {
+        console.log('else is ++++++++')
+        console.log(data)
+      }
+  }
+
+  async addRecord() {
+    const data = await wxRequest.Post('records/', 
+      {'record_type': 1, 'amount': '123111'}, )
+    if (typeof data !== 'undefined') {
+      
+      console.log('add record is ++++++++', data)
+    } else {
+      console.log('else is ++++++++')
+      console.log(data)
+    }
+  }
+
+  async listRecord() {
+    const data = await wxRequest.Get('records/' )
+    if (typeof data !== 'undefined') {
+      
+      console.log('get record is ++++++++', data)
+    } else {
+      console.log('else is ++++++++')
+      console.log(data)
     }
   }
 
@@ -220,3 +311,12 @@ export default class extends wepy.app {
 @import "/public/styles/iconfont.wxss";
 @import "/public/styles/common.less";
 </style>
+
+
+// 1. GET users/self/challenges/ 可以獲取到當前用戶參加過的挑戰. 按結束日期倒序排
+
+// 2. GET和POST /records/ 改成 /challenges/<CHALLENGE_ID>/records/
+// 這個接口你可以獲取到當前的總計。樣例Postman發你了
+
+
+

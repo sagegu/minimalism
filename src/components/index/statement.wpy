@@ -5,14 +5,12 @@
         <image src="{{ statement.icon_path }}"></image>
       </view> -->
       <view class="st-title">
-        <view class="title">{{ statement.category }}</view>
-        <!-- <view class="description" wx:if="{{statement.description}}">{{ statement.description }}</view> -->
-        <view class="time">{{ statement.timeStr }} · {{ statement.description }} · {{ statement.asset }}</view>
+        <view class="title">{{ statement.record_type }} {{ statement.category }}</view>
+        <!-- <view class="description" wx:if="{{statement.description}}">{{ statement.description }}</view> --> <!-- · -->
+        <view class="time">{{ statement.created_at }}  {{ statement.notes }}  {{ statement.asset }}</view>
       </view>
     </view>
-    <view class="amount {{ statement.type }}">
-      {{ statement.money }}
-    </view>
+    <view class="amount"> {{ statement.amount }} </view>
   </view>
 </template>
 
@@ -29,7 +27,8 @@
     methods = {
       statement (key, id) {
         wepy.navigateTo({
-          url: `/pages/statements/detail?${key}=${id}`
+          url: '/pages/statements/detail?id='+ this.statement.id +'&record_type=' + this.statement.record_type  + '&amount=' + this.statement.amount + '&created_at=' + this.statement.created_at + '&notes=' + this.statement.notes + '&type=' +  'expend'
+          // url: `/pages/statements/detail?${key}=${id}`
         })
       }
     }

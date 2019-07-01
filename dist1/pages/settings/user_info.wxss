@@ -1,1 +1,0 @@
-page{background:#f4f4f4}.my-avatar{width:35px;height:35px}.notice-remind{display:flex;justify-content:space-between;padding:12px 15px;background:white}.notice-remind .notice-title{font-size:14px}.notice-remind .notice-time{font-size:12px;padding-left:6px;color:#ccc}.cancel-login-btn{font-size:14px;text-align:center;margin:21px;display:block;color:blue}

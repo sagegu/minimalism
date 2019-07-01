@@ -1,3 +1,0 @@
-@import "./../../components/prepare_order_item.wxss";
-@import "./../../components/prepare_buy_item.wxss";
-.footer{position:fixed;height:90rpx;line-height:90rpx;bottom:0;left:0;text-align:center;width:100%;background:#2196F3;border-top:1px solid #f1f1f1;color:white;font-size:32rpx}.list{margin-bottom:100rpx}.list .tips{font-size:28rpx;color:#757575}.list .total-tips{font-size:14px;text-align:center;margin:12px 0;color:#757575}

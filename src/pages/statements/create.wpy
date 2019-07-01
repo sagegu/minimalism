@@ -127,8 +127,21 @@
       },
       async submit (statement, detail) {
         this.submiting = true
-        const params = {statement: statement, formId: detail.formId}
-        const result = await wxRequest.Post(`statements`, params)
+        // const params = {statement: statement, formId: detail.formId}
+        // console.log('params======', params)
+
+        var id = 1
+        if (Session.get('chanllenge_load_cache')) {
+            let challenge = Session.get('chanllenge_load_cache')
+            id = challenge['id']
+        }
+        console.log('id is =========', id)
+
+        const p = {'record_type': statement['category_id'], 
+                    'amount': statement['amount'],
+                    'notes': statement['description']}
+        const result = await wxRequest.Post('challenges/' + id + '/records/' , p)
+                      
         if (result === undefined) {
           this.submiting = false
           await tip.confirm('由于网络原因，无法同步账单到服务器，现已临时保存在本地，下次网络正常后系统将自动同步到服务端', {}, '保存失败')
@@ -138,26 +151,33 @@
           })
           return false
         }
+        // try {
+          // var success = false
+          // if (result.status === 200 || result.status === 201 ) {
+          //   success = true
+          // }
 
-        try {
-          if (result.status === 200) {
-            const store = getStore()
-            store.dispatch(addStatement(result.data))
-            for (let file of statement.upload_files) {
-              await wxRequest.Upload(file, {
-                type: 'statement_upload',
-                statement_id: result.data.id
-              })
-            }
+          //             console.log('============157',success)
+          // if (success) {//result.status === 200 || result.status === 201) {
+            // const store = getStore()
+            // store.dispatch(addStatement(result.data))
+            // for (let file of statement.upload_files) {
+            //   await wxRequest.Upload(file, {
+            //     type: 'statement_upload',
+            //     statement_id: result.data.id
+            //   })
+            // }
+            console.log('============wanna go back')
             wepy.navigateBack({
               delta: 1
             })
-          } else {
-            tip.error(result.msg)
-          }
-        } catch (e) {
-          console.log(e)
-        }
+          // } else {
+          //   tip.error(result.msg)
+          // }
+        // } catch (e) {
+        //   console.log('============xxx wanna go back')
+        //   console.log(e)
+        // }
         this.submiting = false
       }
     }

@@ -1,3 +1,0 @@
-@import "./../../components/index/statement.wxss";
-@import "./../../components/empty.wxss";
-.input-box{padding:12px;background:#f4f4f4}.input-box input{background:white;padding:6px}.result-tip{font-size:12px;color:#212121;margin:12px}.input-placeholder{font-size:14px}.loading-icon{display:flex;justify-content:center;margin:12px}

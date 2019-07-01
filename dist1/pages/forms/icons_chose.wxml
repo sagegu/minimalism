@@ -1,8 +1,0 @@
-
-  <view class="container">
-    <view class="category-flex"  wx:for="{{ icons }}">
-      <view wx:for="{{item}}" bindtap="choseIcon" data-wpychoseicon-a="{{ item }}">
-        <image src="{{ host }}{{ item }}"/>
-      </view>
-    </view>
-  </view>

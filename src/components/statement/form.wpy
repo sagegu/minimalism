@@ -2,23 +2,56 @@
   <form bindsubmit="formSubmit" report-submit="true">
     <view class="container">
       <view class="column money">
-        <text>{{ statement.category_name }}</text>
-        <input class="money-input {{ statement.type }}" placeholder="0.00" placeholder-class="{{ statement.type }}" bindinput="handleAmountInput" name="amount" type="digit" value="{{ statement.amount }}"/>
+        <text class="fs20">{{ statement.record_type }}</text>
+        <input class="money-input {{ statement.type }}" placeholder="0.00" placeholder-class="{{ statement.type }}" bindinput="handleAmountInput" name="amount" type="digit" auto-focus value="{{ statement.amount }}"/>
       </view>
 
       <view class="column-category" > 
-        <text @tap="chooseCategory({{ '吃喝' }})" >吃喝</text>
-        <text @tap="chooseCategory({{ '交通' }})" >交通</text>
-        <text @tap="chooseCategory({{ '买菜' }})" >买菜</text>
-        <text @tap="chooseCategory({{ '服饰鞋包' }})" >服饰鞋包</text>
-        <text @tap="chooseCategory({{ '化妆护肤' }})" >化妆护肤</text>
+        <view wx:if="{{selected_category==2}}">
+        <text @tap="chooseCategory({{ 2 }})" class="selected-category" >吃喝</text>
+        </view>
+        <view wx:else>
+                <text @tap="chooseCategory({{ 2 }})" class="text-category">吃喝</text>
+        </view>
+
+        <view wx:if="{{selected_category==1}}">
+                <text @tap="chooseCategory({{ 1 }})" class="selected-category" >购物</text>
+        </view>
+        <view wx:else>
+                <text @tap="chooseCategory({{ 1 }})" class="text-category">购物</text>
+        </view>
+
+        <view wx:if="{{selected_category==3}}">
+                <text @tap="chooseCategory({{ 3 }})" class="selected-category" >买菜</text>
+        </view>
+        <view wx:else>
+                <text @tap="chooseCategory({{ 3 }})" class="text-category">买菜</text>
+        </view>
+
       </view>
       <view class="column" > 
-        <text @tap="chooseCategory({{ '日用品' }})" >日用品</text>
-        <text @tap="chooseCategory({{ '娱乐' }})" >娱乐</text>
-        <text @tap="chooseCategory({{ '宠物' }})" >宠物</text>
-        <text @tap="chooseCategory({{ '孩子' }})" >孩子</text>
-        <text @tap="chooseCategory({{ '其他' }})" >其他</text>
+
+        <view wx:if="{{selected_category==4}}">
+        <text @tap="chooseCategory({{ 4 }})" class="selected-category" >交通</text>
+        </view>
+        <view wx:else>
+                <text @tap="chooseCategory({{ 4 }})" class="text-category" >交通</text>
+        </view>
+
+        <view wx:if="{{selected_category==5}}">
+                <text @tap="chooseCategory({{ 5 }})" class="selected-category" >娱乐</text>
+        </view>
+        <view wx:else>
+                <text @tap="chooseCategory({{ 5 }})" class="text-category" >娱乐</text>
+        </view>
+
+        <view wx:if="{{selected_category==6}}">
+                <text @tap="chooseCategory({{ 6 }})" class="selected-category" >其他</text>
+        </view>
+        <view wx:else>
+                <text @tap="chooseCategory({{ 6 }})" class="text-category" >其他</text>
+        </view>
+        
       </view>
 
      <!--  <view class="frequent-use" wx:if="{{ categories_labels.length > 0 }}">
@@ -37,7 +70,7 @@
         <text class="label" wx:for="{{ assets_labels }}" @tap="setAsset({{ item }})">{{ item.name }}</text>
       </view> -->
       
-      <view class="column">
+      <!-- <view class="column">
         <text>日期</text>
         <picker mode="date" start="2017-01-01" bindchange="dateChange">
           <text>{{ statement.date }}</text>
@@ -51,7 +84,7 @@
         <text class="label" @tap="quickSetDate('-2')">前天</text>
         <text class="label" @tap="quickSetDate('-1')">昨天</text>
         <text class="label" @tap="quickSetDate('0')">今天</text>
-      </view> 
+      </view>  -->
       
       <view class="column">
         <text>备注</text>
@@ -85,14 +118,14 @@ export default class StatementFormComponent extends wepy.component {
         return {
           id: 0,
           type: 'expend',
-          category_id: 0,
+          category_id: 2,
           asset_id: 0,
           amount: '',
           description: '',
           date: '',
           address: '',
           time: '',
-          category_name: '吃喝',
+          record_type: '吃喝',
           asset_name: '请选择账户',
           upload_files: []
         }
@@ -113,17 +146,18 @@ export default class StatementFormComponent extends wepy.component {
     street: '',
     assets_labels: [],
     categories_labels: [],
-    switchCheck: Session.get('getLocationSwitch') || false
+    switchCheck: Session.get('getLocationSwitch') || false,
+    selected_category: 2,
   }
 
   onLoad () {
     this.statement.type = this.type
     if (this.statement.id === 0) {
       this.initTodayDate()
-      if (this.switchCheck) this.setLocation()
+      // if (this.switchCheck) this.setLocation()
     }
-    this.guessCategory()
-    this.guessAsset()
+    // this.guessCategory()
+    // this.guessAsset()
   }
 
   initTodayDate () {
@@ -198,11 +232,15 @@ export default class StatementFormComponent extends wepy.component {
     },
     setCategory (category) {
       this.statement.category_id = category.id
-      this.statement.category_name = category.name
+      this.statement.record_type = category.name
     },
     chooseCategory (category) {
        //tip.toast(category)
-       this.statement.category_name = category
+       let categories = {1:'购物', 2: '吃喝', 3:'买菜', 4:'交通', 5:'娱乐', 6: '其他'}
+       this.statement.record_type = categories[category]
+       this.statement.category_id = category
+
+       this.selected_category = category
     },
     getLocation (e) {
       const locationSwitch = e.detail.value
@@ -215,6 +253,7 @@ export default class StatementFormComponent extends wepy.component {
         this.$apply()
       }
     },
+    
     async formSubmit ({ detail }) {
       const statement = detail.value
       if (statement.amount == 0 || statement.amount == '') {
@@ -227,12 +266,12 @@ export default class StatementFormComponent extends wepy.component {
         return false
       }
 
-      if (statement.asset_id == 0) {
-        tip.error('未选择账户')
-        return false
-      }
-
-      statement.upload_files = this.statement.upload_files
+      // if (statement.asset_id == 0) {
+      //   tip.error('未选择账户')
+      //   return false
+      // }
+      statement['category_id'] = this.statement.category_id
+      // statement.upload_files = this.statement.upload_files
       this.$emit('submit', statement, detail)
     },
     showPicture (item) {

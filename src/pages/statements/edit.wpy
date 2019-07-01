@@ -41,7 +41,7 @@
     }
 
     onLoad (options) {
-      this.getStatement(options.id)
+      //this.getStatement(options.id)
     }
 
     methods = {

@@ -11,7 +11,7 @@ page {
   > .column {
     height: 100rpx;
     line-height: 100rpx;
-    padding:0 24rpx;
+    padding:0 44rpx;
     border-bottom: 1px solid #efefef;
     font-size: 28rpx;
     background: white;
@@ -33,7 +33,7 @@ page {
   > .column-category {
     height: 100rpx;
     line-height: 100rpx;
-    padding:0 24rpx;
+    padding:0 44rpx;
     border-bottom: 0px solid #efefef;
     font-size: 28rpx;
     background: white;
@@ -142,7 +142,7 @@ page {
     margin:12px;
     button {
       color: white;
-      background-color: $primaryColor;
+      background-color: #EC6464;
     }
   }
   .frequent-remarks {
@@ -155,5 +155,18 @@ page {
       color: $secondaryText;
       border-radius:4px;
     }
+  }
+  
+  .text-category {
+      background-color: #ffffff;
+      color: #000000;
+  }
+
+  .selected-category {
+      background-color: #EC6464;
+      color: #ffffff;
+      border-radius:4px;
+      padding:8rpx 54rpx;
+      margin: 0px 0rpx;
   }
 }

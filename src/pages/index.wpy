@@ -3,16 +3,21 @@
     <view class="header">
       <image class="bg" src="{{ header.bg_avatar }}"></image>
       <view class="level-2">
-        <view class="fs14">
+        <view class="fs16">
           <text>{{ header.position_1_human_name }}</text>
         </view>
-        <view class="fs21 today-expend">{{ header.position_1_amount }}</view>
+        <view class="fs19 today-expend">{{ currentTotal }}</view>
         <view class="overflow-hide">
-          <view class="pull-left fs14"  @tap="gotoChallenge">{{ header.position_2_human_name }} {{ header.position_2_amount }}</view>
-          <view class="pull-right fs14">{{ header.position_3_human_name }} {{ header.position_3_amount }}</view>
-        </view>
+          <view class="pull-left fs13"  @tap="gotoChallenge">{{ header.position_2_human_name }} {{ challenge.target_amount }}, {{ header.position_3_human_name }} {{ currentTotal > challenge.target_amount ? 0 : (challenge.target_amount - currentTotal) }}</view>
+          <!-- <view class="pull-right fs13">{{ header.position_3_human_name }} {{ header.position_3_amount }}</view>
+ -->          
+      <view  class="share-auth-float" >
+        <button open-type="share" >分享</button>
+        <button bindtap="submit" >打卡</button>
       </view>
-      
+        </view>
+      </view>     
+
       <i-notice-bar icon="systemprompt" wx:if="{{ header.show_notice_bar }}">
         <navigator wx:if="{{ header.notice_bar_path }}" url="{{ header.notice_bar_path }}">
           <text>{{ header.notice_text }}</text>
@@ -21,19 +26,16 @@
       </i-notice-bar>
     </view>
     
-<!--     <view class="zan-btns new-record">
+<!--      <view class="zan-btns new-record">
       <navigator url="/pages/statements/create">
         <button class="zan-btn jz-btn btn-shadow">记一笔</button>
       </navigator>
     </view> -->
-
- 
-
     <view class="statement-list" wx-if="{{ list.length > 0 }}">
       <repeat for="{{ list }}" key="index" index="index" item="item">
         <StatementItem :statement.sync="item"></StatementItem>
       </repeat>
-    </view>
+    </view> 
     
     <view wx:if="{{ list.length == 0 }}">
       <empty :title.sync="emptyTitle"></empty>
@@ -42,6 +44,18 @@
 
      <view class="coupons-float" @tap="gotoCreate">
       <image src="../public/images/edit.png"></image>
+    </view>
+
+    <view wx:if="{{ !userInfo }}">
+     
+     <view class="auth-float">
+      
+      <image src="../public/images/nimumallogo.png"></image>
+<!--       <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">Get Phone</button>
+ -->
+      <button open-type="getUserInfo" bindgetuserinfo="getUserInfo">开启极简星球账本</button>
+
+    </view>
     </view>
 
 </template>
@@ -69,7 +83,12 @@
      
       list: [ {id: '1', description: '今天很能花', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'},
              {id: '1', description: '雪顶咖啡', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'}  ],
-      header: {position_1_human_name: "总支出", position_1_amount: "998", position_2_human_name: "挑战组1-挑战金额", position_2_amount: "1000", position_3_human_name:"挑战预算结余", position_3_amount: "2" }
+      header: {position_1_human_name: "总支出", position_1_amount: "998", position_2_human_name: "挑战金额", position_2_amount: " ", position_3_human_name:"预算结余", position_3_amount: "2" },
+
+      userInfo: false,
+      challenge: {id: 1, target_amount: "10010"},
+      currentTotal: 0,
+      submiting: false,
     }
 
     components = {
@@ -79,8 +98,17 @@
 		}
 
     onShow () {
-      this.getHeader()
+      // this.getHeader()
+      //必须先获取challenge id
+      this.getChanllengeList()
       this.getList()
+
+        var access = ''
+        if (Session.get('access') !== null) {
+          access = Session.get('access')
+
+          this.userInfo = true
+        }
     }
 
     methods = {
@@ -89,6 +117,35 @@
       },
       gotoChallenge () {
         wx.navigateTo({ url: "/pages/asset" })
+      },
+      getUserInfo () {
+        this.userInfo = true
+      },
+      getPhoneNumber () {
+      },
+      async submit () {
+       this.submiting = true
+       var id = 1
+        if (Session.get('chanllenge_load_cache')) {
+            let challenge = Session.get('chanllenge_load_cache')
+            id = challenge['id']
+        }
+        console.log('id is =========', id)
+
+        const p = {'record_type': 6, 
+                    'amount': 0,
+                    'notes': '今日无消费'}
+        const result = await wxRequest.Post('challenges/' + id + '/records/' , p)
+                      
+        if (result === undefined) {
+          this.submiting = false
+          await tip.confirm('由于网络原因，无法同步账单到服务器，现已临时保存在本地，下次网络正常后系统将自动同步到服务端', {}, '保存失败')
+          Session.pushFailStatement(params)
+          return false
+        }
+        this.getList()
+
+        this.submiting = false
       }
     }
 
@@ -109,22 +166,56 @@
     }
 
     async getList() {
-      if (Session.get('index_load_cache')) {
-        this.list = Session.get('index_load_cache')
+          
+      console.log('this.list is ++++++++', this.list)
+      if (Session.get('index_load_cache1')) {
+        this.list = Session.get('index_load_cache1')
+        this.$apply()
+      }      
+
+      // current total
+      if (Session.get('current_total_load_cache')) {
+        this.currentTotal = Session.get('current_total_load_cache')
         this.$apply()
       }
 
       const store = getStore()
       const result = await store.dispatch(asyncList())
       if (typeof result.payload === 'undefined') {
-        Tip.error("可能由于网络问题，获取列表失败", 2300)
+       // Tip.error("可能由于网络问题，获取列表失败", 2300)
         return false
       }
       const res = store.getState().statement.statements
-      this.list = res
-      Session.set('index_load_cache', res)
+      this.list = res.results
+
+      this.currentTotal = res.challenge['current_total']
+      Session.set('index_load_cache1', res.results)
+      this.$apply()
+
+      Session.set('current_total_load_cache', this.currentTotal)
       this.$apply()
     }
+
+    async getChanllengeList() {
+      if (Session.get('chanllenge_load_cache')) {
+        this.challenge = Session.get('chanllenge_load_cache')
+        this.$apply()
+      }
+
+      console.log('session --- get getListChanllenge is ++++++++', this.challenge)
+      const data = await wxRequest.Get('users/self/challenges/' )
+      if (typeof data !== 'undefined') {
+      } else {
+        console.log('else is ++++++++')
+        console.log(data)
+      }
+
+      this.challenge['id'] = data.results[0]['id']
+      this.challenge['target_amount'] = data.results[0]['target_amount']
+
+      Session.set('chanllenge_load_cache', this.challenge)
+      this.$apply()
+   }
 
     computed = {
       showEmpty () {

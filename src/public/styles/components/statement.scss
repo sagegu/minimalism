@@ -4,8 +4,8 @@
   align-items: center;
   justify-content: space-between;
   margin:0 32rpx;
-  border-bottom: 2rpx solid $borderColor;
-  padding:16rpx 0;
+  border-bottom: 1rpx solid $borderColor;
+  padding:18rpx 0;
   color: $primaryText;
   .information {
     display: flex;
@@ -26,16 +26,15 @@
       margin-bottom: 4rpx;
     }
     .title {
-      font-size: 33rpx;
-    }
-    .description {
-      color: $secondaryText;
-      font-size: 22rpx;
+      font-size: 32rpx;
     }
     .time {
       color: $secondaryText;
-      font-size: 20rpx;
+      font-size: 26rpx;
     }
+  }
+  .amount {
+      font-size: 36rpx;
   }
   .transfer-icon {
     margin-right: 16rpx;

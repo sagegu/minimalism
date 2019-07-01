@@ -20,15 +20,65 @@ const getOpenId = async () => {
     return getAuthPromise
   }
 
-  return getAuthPromise = new Promise(async (resolve, reject) => {
-    const wxLogin = await wepy.login()
-    const res = await wepy.request({
-      url: Host.check_openid,
-      method: 'POST',
-      header: { 'X-WX-Code': wxLogin.code, 'X-WX-APP-ID': Host.appid }
-    })
-    resolve(res.data.session)
-  })
+ //  return getAuthPromise = new Promise(async (resolve, reject) => {
+ //    const wxLogin = await wepy.login()
+ //    console.log('1---------------', wxLogin.code)
+ //    const res = await wepy.request({
+ //      url: Host.login,
+ //      method: 'POST',
+ //      data: {'js_code': wxLogin.code,'avatar_url': '123111',
+ // 'nick_name': '123111',
+ // 'city': '123111',
+ // 'province': '123111',
+ // 'country': '123111',
+ // 'gender': '1',
+ // 'language': '123111'},
+ //    }).then((response) => {
+ //            const result = response.data
+
+ //          console.log('result---------------', result)
+ //          console.log('access---------------',result.access)
+
+///////////////////record
+//            const creatone = await wepy.request({
+//       url: Host.url+'/records',
+//       method: 'POST',
+//       data: {'record_type': 1,'amount': '123111', },
+//       header:{ 'Authorization':  'Bearer '+ result.access,
+//       'content-type': 'application/json',
+// }
+//     }).then((response) => {
+      
+//           console.log('---------------', response)
+
+//     }, (err) => {
+//     // Session.pushError({ url: url, method: method, params: params, err: err.message, time: new Date().toLocaleString()})
+//     // wx.showToast({
+//     //   title: '请求不可达',
+//     //   icon: 'none',
+//     //   duration: 3000
+//     // })
+//               console.log('err---------------', err)
+
+//   })
+
+  //   }, (err) => {
+  //   // Session.pushError({ url: url, method: method, params: params, err: err.message, time: new Date().toLocaleString()})
+  //   // wx.showToast({
+  //   //   title: '请求不可达',
+  //   //   icon: 'none',
+  //   //   duration: 3000
+  //   // })
+  //             console.log('s---------------', err) 
+
+  // })
+
+  //   resolve(res )
+  // })
+
+
+  
+
 }
 
 const doRequest = async (url, method, params, options = {}, callback) => {
@@ -37,7 +87,7 @@ const doRequest = async (url, method, params, options = {}, callback) => {
   if (options.cacheKey) {
     cacheKey = Session.key[options.cacheKey[0]][options.cacheKey[1]]
     const cache = getByCache(cacheKey)
-    if (cache) return cache
+     if (cache) return cache
   }
 
   let pageRoutes = []
@@ -49,25 +99,45 @@ const doRequest = async (url, method, params, options = {}, callback) => {
   }
   
   const thirdSession = await getOpenId()
+
+  console.log('url---------------', url) 
+  console.log('params---------------', params) 
+
+  var access = ''
+  if (Session.get('access') !== null) {
+    access = Session.get('access')
+  }
+
   return wepy.request({
     url: url,
     method: method,
-    data: params,
+    data: params, 
     header: {
       'Content-Type': 'application/json',
       'X-WX-Skey': thirdSession,
       'X-WX-APP-ID': Host.appid,
-      'X-WX-PAGES': pageRoutes.join(',')
+      'X-WX-PAGES': pageRoutes.join(','),
+      'Authorization':  'Bearer ' + access,
     },
   }).then((response) => {
+
+    console.log('url---------------', url) 
+    console.log('url+res---------------', response)
     const statusCode = response.statusCode
-    if (statusCode !== 200) {
+
+    var success = false
+    if (statusCode === 200 || statusCode === 201 ) {
+      success = true
+    }
+    console.log('success---------------', success) 
+
+    if ( !success ) {
       if (url === `${Host.url}/error_upload`) {
         return false
       }
       let message = null
       if (statusCode != 500 && statusCode != 404) {
-        message = e.errMsg
+        // message = e.errMsg
       }
       Session.pushError({ url: url, method: method, params: params, err: message, statusCode: statusCode, time: new Date().toLocaleString()})
       wx.showToast({
@@ -90,7 +160,6 @@ const doRequest = async (url, method, params, options = {}, callback) => {
       if (typeof callback !== 'undefined') {
         callback(result)
       }
-
       return result
     }
   }, (err) => {

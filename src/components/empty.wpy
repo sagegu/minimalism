@@ -1,7 +1,10 @@
 <template lang="wxml">
+    <view class="container">
+
   <view class="empty">
     <view class="iconfont jz-icon-nomoredata empty-no-more"></view>
     <view class="title fs14">{{ title }}</view>
+  </view>
   </view>
 </template>
 
@@ -17,7 +20,15 @@
   }
 </script>
 <style lang="less">
+.container {
+  > view {
+    width: 100%;
+    display: block;
+    
+  }
+}
 .empty {
+  padding: 0 0;
   text-align: center;
   .empty-no-more {
     font-size: 240rpx;
@@ -31,4 +42,21 @@
     color: #999;
   }
 }
+
+.coupons-float {
+  position: fixed;
+  right:90rpx;
+  bottom:80rpx;
+  width:90rpx;
+  height:90rpx;
+  text-align: center;
+  border-radius:50%;
+  border: 1rpx solid #ddd;
+  image {
+   width:60rpx;
+   height:60rpx;
+   margin-top: 10rpx;
+  }
+}
+
 </style>
