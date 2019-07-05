@@ -1,19 +1,13 @@
-# 洁账小程序
+# 极简记账小程序
 > 基于 wepy 开发的一款记账微信小程序
 
 ### 体验二维码
-![二维码](https://github.com/yigger/jiezhang/raw/master/screenshots/qrcode.jpg)
+![二维码](https://github.com/sagegu/minimalism/blob/master/screenshots/qrcode.jpg)
 
 ### 功能
-+ 日常记账，目前只支持基本的收入、支出、转账
-+ 预算管理功能
-+ 搜索功能
-+ 消费报表
++ 日常记账
 + 每月统计报表
 + 首页看板自定义
-+ 根据日历查看消费
-+ 资产统计
-+ 预购清单
 + 消息通知
 + ...
 
@@ -33,24 +27,16 @@ npm run build
 ```
 
 ### 相关截图
-![首页](https://github.com/yigger/jiezhang/raw/master/screenshots/01.png)
+![首页](https://raw.githubusercontent.com/sagegu/minimalism/master/screenshots/01.png)
 
 ### 更新日志
 [Change Log](CHANGELOG.md)
 
-### 服务端地址(开发中)
-https://github.com/yigger/JZ-back 
 
 ### 感谢
 https://tencent.github.io/wepy/  
-https://github.com/dyq086/wepy-mall  
-https://github.com/czcaiwj/calendar  
-https://github.com/TalkingData/iview-weapp
+https://github.com/yigger/jiezhang
 
-### 打赏
-如果你喜欢我的作品，可以请我喝杯咖啡支持下，谢谢你。
-
-![](https://github.com/yigger/jiezhang/raw/master/screenshots/my_qrcode.png)
 
 ### License
-JieZhang is licensed under [The MIT License](LICENSE)
+Minimal is licensed under [The MIT License](LICENSE)

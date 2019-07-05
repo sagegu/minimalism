@@ -2,7 +2,7 @@
   <view class="container">
     <view class="header">
        <view class="level-1"  @tap="gotoBooks">
-          <text>{{ book }} ▽ </text>
+          <text>{{ book }}  🔻 </text>
         </view>
 
       <view class="level-2">
