@@ -2,13 +2,13 @@
   <view class="container">    
     <view class="comonent-list">
       <Expend :statement.sync="statement" @submit.user="submit" :type="expend" wx:if="{{ current == 'expend' }}"/>
-      <Income :statement.sync="statement" @submit.user="submit" :type="income" wx:if="{{ current == 'income' }}"/>
+     <!--  <Income :statement.sync="statement" @submit.user="submit" :type="income" wx:if="{{ current == 'income' }}"/>
       <Transfer :statement.sync="statement" @submit.user="submit" wx:if="{{ current == 'transfer' }}"/>
       <Repayment
         :statement.sync="statement"
         @submit.user="submit"
         wx:if="{{ current == 'repayment' }}"
-      />
+      /> -->
     </view>
   </view>
 </template>
@@ -17,8 +17,8 @@
   import wepy from 'wepy'
   import wxRequest from '@/utils/wxRequest'
   import StatementForm from '@/components/statement/form'
-  import Transfer from '@/components/statement/transfer'
-  import Repayment from '@/components/statement/repayment'
+  // import Transfer from '@/components/statement/transfer'
+  // import Repayment from '@/components/statement/repayment'
   import { getStore } from 'wepy-redux'
   import { addStatement, modifyStatement } from '@/store/actions'
   import tip from '@/utils/tip'
@@ -42,12 +42,32 @@
 
     onLoad (options) {
       //this.getStatement(options.id)
+      this.statement = options
+
+       let categories = {'购物':1, '吃喝':2, '买菜':3, '交通':4, '娱乐':5, '其它': 6}
+       let key = this.statement.record_type
+       // var category_id = 2
+       // if (key == '购物') {
+       //    category_id = 1
+       // } else if (key == '吃喝') {
+       //    category_id = 2
+       // } else if (key == '买菜') {
+       //    category_id = 3
+       // } else if (key == '交通') {
+       //    category_id = 4
+       // } else if (key == '娱乐') {
+       //    category_id = 5
+       // } else if (key == '其它') {
+       //    category_id = 6
+       // } 
+       this.statement['category_id'] = categories[key] //category_id
+       // console.log('$$$$$$$$$$$$$$$$ edit  this.statement', this.statement)
     }
 
     methods = {
-      handleChange ({ detail }) {
-        this.current = detail.key
-      },
+      // handleChange ({ detail }) {
+      //   this.current = detail.key
+      // },
       async submit (statement) {
         // 查找需要删除的图片
         const statement_paths = this.statement_avatar.map((f) => f.path )
@@ -55,48 +75,59 @@
         const del_ids = del_obj.map((f) => f.id)
         statement.del_avatar_ids = del_ids
 
-        const result = await wxRequest.Put(`statements/${this.statement.id}`, {statement: statement})
-        if (result.status == 200) {
+        const p = {'record_type': statement['category_id'], 
+                    'amount': statement['amount'],
+                    'notes': statement['description']}
+
+        // console.log('$$$$$$$$$$$$$$$$ this.statement', this.statement)
+        // console.log('$$$$$$$$$$$$$$$$ statement', statement)
+
+        const result = await wxRequest.Put(`records/${this.statement.id}/`, p)
+        //console.log('$$$$$$$$$$$$$$$$ result', result)
+        // /{record_type: 6, amount: 3, notes: ""}
+
+        if (result.record_type == statement['category_id'] || result.status == 200 || result.statusCode == 200) {
           const store = getStore()
           store.dispatch(modifyStatement(result.data))
           // 更新上传图片
-          for (let file of statement.upload_files) {
-            if (statement_paths.indexOf(file) === -1) {
-              await wxRequest.Upload(file, {
-                type: 'statement_upload',
-                statement_id: result.data.id
-              })
-            }
-          }
+          // for (let file of statement.upload_files) {
+          //   if (statement_paths.indexOf(file) === -1) {
+          //     await wxRequest.Upload(file, {
+          //       type: 'statement_upload',
+          //       statement_id: result.data.id
+          //     })
+          //   }
+          // } 
           wepy.navigateBack({
-            delta: 1
+            delta: 2
           })
         } else {
-          tip.error(result.msg)
+          console.log('err $$$$$$$$$$$$$$$$ statement', result)
+          //tip.error(result.msg)
         }
       }
     }
 
-    async getStatement (id) {
-      const statement = await wxRequest.Get(`statements/${id}`)
-      if (statement.status != undefined && statement.status != 200) {
-        wepy.navigateBack({
-          delta: 1
-        })
-        tip.error('无效的账单')
-      }
-      this.current = statement.type
-      this.statement = statement
-      this.statement_avatar = statement.upload_files
-      this.statement.upload_files = statement.upload_files.map((f) => f.path)
-      this.$apply()
-    }
+    // async getStatement (id) {
+    //   const statement = await wxRequest.Get(`statements/${id}`)
+    //   if (statement.status != undefined && statement.status != 200) {
+    //     wepy.navigateBack({
+    //       delta: 1
+    //     })
+    //     tip.error('无效的账单')
+    //   }
+    //   this.current = statement.type
+    //   this.statement = statement
+    //   this.statement_avatar = statement.upload_files
+    //   this.statement.upload_files = statement.upload_files.map((f) => f.path)
+    //   this.$apply()
+    // }
 
     components = {
       'Expend': StatementForm,
-      'Income': StatementForm,
-      Transfer,
-      Repayment
+      // 'Income': StatementForm,
+      // Transfer,
+      // Repayment
     }
 
   }

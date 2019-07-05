@@ -1,37 +1,33 @@
 <template>
 <view class="container">
-  <view class="wallet-header">
-    <view class="header-container">
-      <view class="netWorth">
-        <!-- <view>
+  <!-- <view class="wallet-header">
+     <view class="header-container">
+    <view class="netWorth">
+         <view>
           <text>净资产</text>
           <text
             @tap="eyesTab"
             class="iconfont eye-item-img {{ eyeImageClass }}"
           >
           </text>
-        </view> -->
+        </view> 
         <view>极简星球邀你挑战</view>
-      </view>
+      </view>-->
 
       <!-- <view class="asset-and-debt">
         <text>总资产 {{ hiddenMoney ? '****' : totalAssets }}</text>
         <text>|</text>
         <text>总负债 {{ hiddenMoney ? '****' : totalDebt }}</text>
-      </view> -->
+      </view> 
     </view>
-  </view>
+  </view>-->
 
   <view id="all-assets">
     <view class="asset" wx:for="{{ wallets }}">
       <view class="asset-header">
         <text >{{ item.name }}</text>
-<!--         <text   class="title">{{ hiddenMoney ? '****' : item.amount }}</text>
- -->      </view>
-      <view class="column" wx:for="{{ item.childs }}" bindtap="showAsset('{{ item.id }}')">
-       <!--  <view class="icon pull-left">
-          <image class="icon-small-size" src="{{ item.icon_path }}"></image>
-        </view> -->
+      </view>
+      <view class="column" wx:for="{{ item.children }}" bindtap="showAsset('{{ item.id }}')">
         <view class="money pull-right">{{ hiddenMoney ? '****' : item.amount }}</view>
         <view class="title">{{ item.name }}</view>
       </view>
@@ -54,11 +50,7 @@
     }
     
 		data = {
-    	wallets: [{name: "极简生活挑战", childs: [{id: 1, name: "一个月1000块", amount: 1000}, 
-                                        {id: 2, name: "一个月1500块", amount: 1000}]},
-                {name: "腹肌挑战", childs: [{id: 1, name: "3块腹肌", amount:  ""}, 
-                                        {id: 2, name: "六块腹肌", amount: ""}]}
-                                        ],
+    	wallets: [{name: "", children: [ ]}], 
 			netWorth: '0.00',
 			totalAssets: '0.00',
 			totalDebt: '0.00',
@@ -69,8 +61,10 @@
 
     methods = {
       showAsset (id) {
-        // wx.navigateTo({ url: `/pages/assets/asset_detail?id=${id}` })
-        wx.navigateTo({ url: `/pages/index` })
+ 
+        Session.set('current_book_id', id)
+ 
+        wx.navigateBack({ delta: 1})
       },
       async eyesTab () {
         this.$parent.globalData.user.hidden_asset_money = !this.$parent.globalData.user.hidden_asset_money
@@ -83,7 +77,8 @@
         // this.wallets = Session.get('@asset_list_load_cache@')
         this.$apply()
       }
-			this.getAssets()
+			//this.getAssets()
+      this.getChanllengeList()
 		}
     
     computed = {
@@ -94,6 +89,33 @@
         return this.hiddenMoney ? 'jz-icon-yanjing-zheng' : 'jz-icon-yanjing-bi'
       }
     }
+
+    async getChanllengeList() {
+      this.wallets[0].children = []
+      if (Session.get('challenge_load_cache')) {
+        var challenge = Session.get('challenge_load_cache')
+      
+        for (var i = challenge.length - 1; i >= 0; i--) {
+         this.wallets[0].children.push(challenge[i])
+        }  
+      
+        this.$apply()
+        
+        console.log('session --- get getListChanllenge is ++++++++', this.wallets)
+      }
+
+      const data = await wxRequest.Get('users/self/books/' )
+      if (typeof data !== 'undefined') {
+      } else {
+      }
+       
+      var challenge = data.results
+      Session.set('challenge_load_cache', challenge)
+      
+      for (var i = challenge.length - 1; i >= 0; i--) {
+         this.wallets[0].children.push(challenge[i])
+      }
+   }
 
 		async getAssets() {
       const data = await wxRequest.Get('wallet');

@@ -1,20 +1,23 @@
 <template>
   <view class="container">
     <view class="header">
-      <image class="bg" src="{{ header.bg_avatar }}"></image>
+       <view class="level-1"  @tap="gotoBooks">
+          <text>{{ book }} ▽ </text>
+        </view>
+
       <view class="level-2">
         <view class="fs16">
-          <text>{{ header.position_1_human_name }}</text>
+          <text>{{ headerTitle }}</text>
         </view>
         <view class="fs19 today-expend">{{ currentTotal }}</view>
-        <view class="overflow-hide">
-          <view class="pull-left fs13"  @tap="gotoChallenge">{{ header.position_2_human_name }} {{ challenge.target_amount }}, {{ header.position_3_human_name }} {{ currentTotal > challenge.target_amount ? 0 : (challenge.target_amount - currentTotal) }}</view>
-          <!-- <view class="pull-right fs13">{{ header.position_3_human_name }} {{ header.position_3_amount }}</view>
- -->          
-      <view  class="share-auth-float" >
-        <button open-type="share" >分享</button>
-        <button bindtap="submit" >打卡</button>
-      </view>
+        <view class="overflow-hide" wx:if="{{ bookTypeId==1 }}">  
+          <view class="pull-left fs13">{{ header.position_2_human_name }} {{ header.position_2_amount }}, {{ header.position_3_human_name }} {{ header.position_3_amount }} 
+          </view>
+        </view> 
+
+        <!-- 打卡 -->
+        <view  class="pull-right share" >
+            <button open-type="share" >分享打卡</button>
         </view>
       </view>     
 
@@ -35,21 +38,27 @@
       <repeat for="{{ list }}" key="index" index="index" item="item">
         <StatementItem :statement.sync="item"></StatementItem>
       </repeat>
-    </view> 
-    
+    </view>
+
     <view wx:if="{{ list.length == 0 }}">
       <empty :title.sync="emptyTitle"></empty>
     </view>
   </view>
 
-     <view class="coupons-float" @tap="gotoCreate">
-      <image src="../public/images/edit.png"></image>
+<!-- 记账 -->
+     <view class="column"> 
+        <view >
+          <text wx:if="{{ !submiting }}" @tap="createZero" class="selected-category" >今日无消费</text>
+           <text wx:else class="selected-category">今日无消费...</text>
+        </view>
+        <view >
+          <text @tap="gotoCreate" class="text-category" >记账</text>
+        </view>
     </view>
 
-    <view wx:if="{{ !userInfo }}">
-     
-     <view class="auth-float">
-      
+<!-- 请求授权 -->
+    <view wx:if="{{ !userInfo }}">  
+     <view class="auth-float">      
       <image src="../public/images/nimumallogo.png"></image>
 <!--       <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">Get Phone</button>
  -->
@@ -78,17 +87,23 @@
     }
 
     data = {
+      book: '日常账本',
+      bookTypeId: 1,
       emptyTitle: '本周还没有开始记账哦~',
       orderEmptyTitle: '无预购清单，点击下方添加一笔吧',
      
-      list: [ {id: '1', description: '今天很能花', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'},
-             {id: '1', description: '雪顶咖啡', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'}  ],
-      header: {position_1_human_name: "总支出", position_1_amount: "998", position_2_human_name: "挑战金额", position_2_amount: " ", position_3_human_name:"预算结余", position_3_amount: "2" },
+      // list: [ {id: '1', description: '今天很能花', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'},
+      //        {id: '1', description: '雪顶咖啡', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'}  ],
+      list: [],
+      header: { position_2_human_name: "挑战金额", position_2_amount: " ", position_3_human_name:"结余", position_3_amount: " " },
+
+      headerTitle:  "当月支出",
 
       userInfo: false,
-      challenge: {id: 1, target_amount: "10010"},
       currentTotal: 0,
       submiting: false,
+      currentPageIndex: 1,
+      hasMoreData: true,
     }
 
     components = {
@@ -96,19 +111,45 @@
       orderEmpty: Empty,
       StatementItem
 		}
+  
+    globalData = {
+      user: {},
+    }
 
     onShow () {
-      // this.getHeader()
-      //必须先获取challenge id
-      this.getChanllengeList()
-      this.getList()
+      this.hasMoreData = true
+      this.currentPageIndex  = 1
 
-        var access = ''
-        if (Session.get('access') !== null) {
-          access = Session.get('access')
+      if (Session.get('login_unauthorized') !== null ) {
+         this.userInfo = Session.get('login_unauthorized')  
+      }
 
-          this.userInfo = true
-        }
+      this.postUser() 
+
+      if (Session.get('access')) {
+                //必须先获取challenge id
+                  this.getChanllengeList()
+                  this.getList()
+                
+                  this.updateUI()
+      }
+
+    }
+
+    onPullDownRefresh() {
+      this.getList()       
+      console.log('onPullDownRefresh  ++++++++')
+      this.hasMoreData = true
+      this.currentPageIndex  = 1
+    }
+    
+    onShareAppMessage () {
+
+    }
+    
+    onReachBottom () {
+      this.getMoreList()
+
     }
 
     methods = {
@@ -116,26 +157,42 @@
         wx.navigateTo({ url: "/pages/statements/create" })
       },
       gotoChallenge () {
+        //wx.navigateTo({ url: "/pages/asset" })
+      },
+      gotoBooks () {
         wx.navigateTo({ url: "/pages/asset" })
       },
-      getUserInfo () {
+      getUserInfo (res) {
         this.userInfo = true
+        if(res.detail.userInfo) {
+          console.log('用户点击了授权按钮')
+
+          if (this.userInfo) {
+
+             this.postUser() 
+
+                   
+          }
+        }else {
+          console.log('用户点击了取消按钮')
+        }
       },
       getPhoneNumber () {
       },
-      async submit () {
+      async createZero () {
+       if (this.submitting == true) {
+        return
+       }
        this.submiting = true
-       var id = 1
-        if (Session.get('chanllenge_load_cache')) {
-            let challenge = Session.get('chanllenge_load_cache')
-            id = challenge['id']
-        }
-        console.log('id is =========', id)
+       var booId = 1
+       if (Session.get('current_book_id')) {
+          booId = Session.get('current_book_id')
+       }
 
         const p = {'record_type': 6, 
                     'amount': 0,
                     'notes': '今日无消费'}
-        const result = await wxRequest.Post('challenges/' + id + '/records/' , p)
+        const result = await wxRequest.Post('books/' + booId + '/records/' , p)
                       
         if (result === undefined) {
           this.submiting = false
@@ -148,6 +205,123 @@
         this.submiting = false
       }
     }
+
+    updateUI() {
+      var books = []
+      if (Session.get('challenge_load_cache')) {
+         books = Session.get('challenge_load_cache')
+         console.log('seesion books ++++++++++++++++', books)
+      }
+      var bookId = 1
+      if (Session.get('current_book_id') !== null) {
+         bookId = Session.get('current_book_id')
+         console.log('seesion bookId ++++++++++++++++', bookId)
+      } 
+      console.log('bookId ++++++++++++++++', bookId)
+      console.log('books  ++++++++++++++++', books)
+
+      for (var i = books.length - 1; i >= 0; i--) {
+        if (books[i]['id'] == bookId) {
+          this.book = books[i]['name']
+          this.bookTypeId = books[i]['book_type_id']
+
+          this.currentTotal = books[i]['month_to_date_total']
+
+
+          console.log('books[i] ++++++++++++++++', books[i])
+        }
+      }
+    }
+
+    // 预加载用户
+   async postUser() {  
+    const wxLogin =  wepy.login().then((loginResponse) => {
+      console.log('login code record is ++++++++', loginResponse)
+
+        const wxLogin1 =  wepy.login().then((resp) => {
+          console.log('2login code record is ++++++++', resp)
+        })
+
+        wepy.getUserInfo().then((response) => {  
+
+          this.globalData.user = response.userInfo
+          response.userInfo['js_code'] = loginResponse.code
+ 
+          console.log('getUserInfo ++++++++', response)
+
+          Session.set('login_unauthorized', 'false')
+
+          this.userInfo = true
+          this.$apply()
+          
+          if (Session.get('access') === null) {
+
+              this.login()
+          }
+
+
+      }, (err) => {
+          console.log('getUserInfo err ++++++++', err)
+
+          this.userInfo = false  
+          this.$apply()
+          Session.set('login_unauthorized', 'false')
+      }) 
+
+              // Session.set('access', data.access)
+ 
+    }) 
+  }
+
+   async login() {
+      var city = this.globalData.user['city']
+      if (city.length == 0) {
+        city = 'a city'
+      }
+      var province = this.globalData.user['province']
+      if (province.length == 0) {
+        province = 'a province'
+      }
+      var country = this.globalData.user['country']
+      if (country.length == 0) {
+        country = 'a country'
+      }
+      var language = this.globalData.user['language']
+      if (language.length == 0) {
+        language = 'a language'
+      }
+      const data = await wxRequest.Post('simple-wechat-login/', {
+                'js_code': this.globalData.user['js_code'],
+                 'avatar_url': this.globalData.user['avatarUrl'],
+                 'nick_name': this.globalData.user['nickName'],
+                 'city': city,
+                 'province': province, 
+                 'country': country,
+                 'gender': this.globalData.user['gender'],
+                 'language': language})
+
+      if (typeof data !== 'undefined') {
+
+        this.globalData.user = data
+
+        if (Session.get('access') === null) {
+          Session.set('access', data.access)
+                //必须先获取challenge id
+          //还没有默认选中的book id，不用getlist
+          if (Session.get('current_book_id') === null ) {
+            this.getChanllengeList()
+          }
+          //this.getList()
+                
+          this.updateUI()
+        }
+
+      } else {
+        console.log('else is ++++++++')
+        console.log(data)
+      }
+  }
+
 
     async getHeader () {
       if (Session.get('header_load_cache')) {
@@ -181,40 +355,87 @@
 
       const store = getStore()
       const result = await store.dispatch(asyncList())
-      if (typeof result.payload === 'undefined') {
-       // Tip.error("可能由于网络问题，获取列表失败", 2300)
-        return false
-      }
-      const res = store.getState().statement.statements
-      this.list = res.results
+      
 
-      this.currentTotal = res.challenge['current_total']
+      const res = store.getState().statement.statements
+      
+      this.list = res.results 
+
+      if (res.book['book_type_id'] === 2) {
+        this.currentTotal = res.book['month_to_date_total']
+        this.headerTitle = "当月支出"
+      }
+      else {
+        this.currentTotal = res.challenge['current_total']
+        this.headerTitle = "总支出"
+        this.header.position_2_amount = res.challenge['target_amount']
+
+        let left = this.header.position_2_amount - this.currentTotal
+        this.header.position_3_amount = left < 0 ? 0 : left
+      }
+      // this.currentTotal = res.challenge['current_total']
       Session.set('index_load_cache1', res.results)
-      this.$apply()
 
       Session.set('current_total_load_cache', this.currentTotal)
       this.$apply()
     }
 
-    async getChanllengeList() {
-      if (Session.get('chanllenge_load_cache')) {
-        this.challenge = Session.get('chanllenge_load_cache')
-        this.$apply()
+    async getMoreList() {
+      console.log('this.hasMoreData = ++++++++', this.hasMoreData)
+
+      if (this.hasMoreData == false) {
+        return
+      }
+      this.currentPageIndex ++
+      var bookId = 1
+      if (Session.get('current_book_id')) {
+          bookId = Session.get('current_book_id')
+      }
+      
+      console.log('this.currentPageIndex = ++++++++', this.currentPageIndex)
+      const data = await wxRequest.Get('books/' + bookId + '/records/', {page: this.currentPageIndex })
+      console.log('data = ++++++++', data)
+      if (typeof data.results === 'undefined') {
+        return
+      }
+      if (data.results.next == null ){
+        this.hasMoreData = false
       }
 
-      console.log('session --- get getListChanllenge is ++++++++', this.challenge)
-      const data = await wxRequest.Get('users/self/challenges/' )
-      if (typeof data !== 'undefined') {
-      } else {
-        console.log('else is ++++++++')
-        console.log(data)
+      for (var i = data.results.length - 1; i >= 0; i--) {
+         this.list.push(data.results[i])
       }
-
-      this.challenge['id'] = data.results[0]['id']
-      this.challenge['target_amount'] = data.results[0]['target_amount']
-
-      Session.set('chanllenge_load_cache', this.challenge)
+      console.log('this.list =  ++++++++', this.list)
       this.$apply()
+    }
+
+    async getChanllengeList() { 
+      const data = await wxRequest.Get('users/self/books/' )
+      // if (typeof data !== 'undefined') {
+      //   return
+      // } else {
+      // } 
+      
+      //立刻保存数据，账本list，下面如果是初次使用，默认选择第一个
+      Session.set('challenge_load_cache', data.results)
+
+      console.log('getChanllengeList ++++++++++++++++', data)
+
+      if (Session.get('current_book_id') === null ) {
+         // 估计是第一次登录，只有自己的账本，还没有session 
+        var id = data.results[0]['id']
+        Session.set('current_book_id', id)
+        console.log('nulllll   getChanllengeList ++++++++++++++++', id)
+
+        this.getList() 
+        
+        this.updateUI() 
+
+      } else {
+
+      }
+ 
+       
    }
 
     computed = {

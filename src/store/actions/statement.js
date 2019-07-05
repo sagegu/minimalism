@@ -4,15 +4,12 @@ import wxRequest from '@/utils/wxRequest'
 import Session from '@/utils/session'
 
 export const asyncList = createAction(GETLIST, () => {
-	var id = 1
-    if (Session.get('chanllenge_load_cache')) {
-        let challenge = Session.get('chanllenge_load_cache')
-    	console.log('challenge is =========', challenge)
-        id = challenge['id']
-    }
-    console.log('id is =========', id)
-  return new Promise(async (resolve,reject) => {
-    const result = await wxRequest.Get('challenges/' + id + '/records/')
+	   var bookId = 1
+     if (Session.get('current_book_id') !== null) {
+         bookId = Session.get('current_book_id')
+     }
+    return new Promise(async (resolve,reject) => {
+    const result = await wxRequest.Get('books/' + bookId + '/records/')
     resolve(result)
   })
 })

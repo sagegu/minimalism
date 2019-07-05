@@ -113,12 +113,12 @@
     }
 
     onLoad(params) {
-      // 直接显示转账的界面
-      if (typeof params.type !== 'undefined' && params.type === 'transfer') {
-        this.current = params.type
-        this.transferData.source = params.source
-        this.transferData.from = params.asset_id
-      }
+      // // 直接显示转账的界面
+      // if (typeof params.type !== 'undefined' && params.type === 'transfer') {
+      //   this.current = params.type
+      //   this.transferData.source = params.source
+      //   this.transferData.from = params.asset_id
+      // }
     }
 
     methods = {
@@ -130,18 +130,14 @@
         // const params = {statement: statement, formId: detail.formId}
         // console.log('params======', params)
 
-        var id = 1
-        if (Session.get('chanllenge_load_cache')) {
-            let challenge = Session.get('chanllenge_load_cache')
-            id = challenge['id']
+        var bookId = 1
+        if (Session.get('current_book_id')) {
+            bookId = Session.get('current_book_id')
         }
-        console.log('id is =========', id)
-
         const p = {'record_type': statement['category_id'], 
                     'amount': statement['amount'],
                     'notes': statement['description']}
-        const result = await wxRequest.Post('challenges/' + id + '/records/' , p)
-                      
+        const result = await wxRequest.Post('books/' + bookId + '/records/' , p)
         if (result === undefined) {
           this.submiting = false
           await tip.confirm('由于网络原因，无法同步账单到服务器，现已临时保存在本地，下次网络正常后系统将自动同步到服务端', {}, '保存失败')

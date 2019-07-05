@@ -128,41 +128,47 @@ export default class extends wepy.app {
     // this.getUser()
     // this.checkVersionUpdate()
     // this.uploadData()
-    this.postUser()
+    // this.postUser()
   }
 
   // 预加载用户
-  async getUser() {
-    const data = await wxRequest.Get('users')
-    if (typeof data !== 'undefined') {
-      this.globalData.user = data
-      console.log('++++++++')
-      console.log(data)
-    } else {
-      console.log('++++++++')
-      console.log(data)
-    }
+  // async getUser() {
+  //   const data = await wxRequest.Get('users')
+  //   if (typeof data !== 'undefined') {
+  //     this.globalData.user = data
+  //   } else {
+  //   }
 
 
-  }
-
-   // 预加载用户
+  // }
+ 
+  // 预加载用户
   async postUser() {  
     const wxLogin =  wepy.login().then((loginResponse) => {
       console.log('login code record is ++++++++', loginResponse)
-      wepy.getUserInfo().then((response) => {  
+
+        const wxLogin1 =  wepy.login().then((resp) => {
+          console.log('2login code record is ++++++++', resp)
+        })
+        wepy.getUserInfo().then((response) => {  
+
           this.globalData.user = response.userInfo
           response.userInfo['js_code'] = loginResponse.code
 
-          console.log('$$$$$$response.userInfo', this.globalData.user)
-
           this.login()
+
+          Session.set('unauthorized', 'false')
+
+      }, (err) => {
+           Session.set('unauthorized', 'true')
       }) 
-    })   
+
+              // Session.set('access', data.access)
+ 
+    }) 
   }
 
   async login() {
-
       var city = this.globalData.user['city']
       if (city.length == 0) {
         city = 'a city'
@@ -195,40 +201,13 @@ export default class extends wepy.app {
 
         Session.set('access', data.access)
 
-        // console.log('login SUCCESS the data is ++++++++', data)
-
-        // this.addRecord()
-        // this.listRecord()
-
       } else {
         console.log('else is ++++++++')
         console.log(data)
       }
   }
 
-  async addRecord() {
-    const data = await wxRequest.Post('records/', 
-      {'record_type': 1, 'amount': '123111'}, )
-    if (typeof data !== 'undefined') {
-      
-      console.log('add record is ++++++++', data)
-    } else {
-      console.log('else is ++++++++')
-      console.log(data)
-    }
-  }
-
-  async listRecord() {
-    const data = await wxRequest.Get('records/' )
-    if (typeof data !== 'undefined') {
-      
-      console.log('get record is ++++++++', data)
-    } else {
-      console.log('else is ++++++++')
-      console.log(data)
-    }
-  }
-
+  
   // 检查更新
   checkVersionUpdate() {
     if (!wx.canIUse('getUpdateManager')) {
@@ -312,11 +291,5 @@ export default class extends wepy.app {
 @import "/public/styles/common.less";
 </style>
 
-
-// 1. GET users/self/challenges/ 可以獲取到當前用戶參加過的挑戰. 按結束日期倒序排
-
-// 2. GET和POST /records/ 改成 /challenges/<CHALLENGE_ID>/records/
-// 這個接口你可以獲取到當前的總計。樣例Postman發你了
-
-
+ 
 

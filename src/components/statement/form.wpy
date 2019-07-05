@@ -3,25 +3,25 @@
     <view class="container">
       <view class="column money">
         <text class="fs20">{{ statement.record_type }}</text>
-        <input class="money-input {{ statement.type }}" placeholder="0.00" placeholder-class="{{ statement.type }}" bindinput="handleAmountInput" name="amount" type="digit" auto-focus value="{{ statement.amount }}"/>
+        <input class="money-input {{ statement.type }}" placeholder="0.00" placeholder-class="{{ statement.type }}" bindinput="handleAmountInput" name="amount" type="digit"  focus="{{ focus }}" value="{{ statement.amount }}"/>
       </view>
 
       <view class="column-category" > 
-        <view wx:if="{{selected_category==2}}">
+        <view wx:if="{{statement.category_id==2}}">
         <text @tap="chooseCategory({{ 2 }})" class="selected-category" >吃喝</text>
         </view>
         <view wx:else>
                 <text @tap="chooseCategory({{ 2 }})" class="text-category">吃喝</text>
         </view>
 
-        <view wx:if="{{selected_category==1}}">
+        <view wx:if="{{statement.category_id==1}}">
                 <text @tap="chooseCategory({{ 1 }})" class="selected-category" >购物</text>
         </view>
         <view wx:else>
                 <text @tap="chooseCategory({{ 1 }})" class="text-category">购物</text>
         </view>
 
-        <view wx:if="{{selected_category==3}}">
+        <view wx:if="{{statement.category_id==3}}">
                 <text @tap="chooseCategory({{ 3 }})" class="selected-category" >买菜</text>
         </view>
         <view wx:else>
@@ -31,21 +31,21 @@
       </view>
       <view class="column" > 
 
-        <view wx:if="{{selected_category==4}}">
+        <view wx:if="{{statement.category_id==4}}">
         <text @tap="chooseCategory({{ 4 }})" class="selected-category" >交通</text>
         </view>
         <view wx:else>
                 <text @tap="chooseCategory({{ 4 }})" class="text-category" >交通</text>
         </view>
 
-        <view wx:if="{{selected_category==5}}">
+        <view wx:if="{{statement.category_id==5}}">
                 <text @tap="chooseCategory({{ 5 }})" class="selected-category" >娱乐</text>
         </view>
         <view wx:else>
                 <text @tap="chooseCategory({{ 5 }})" class="text-category" >娱乐</text>
         </view>
 
-        <view wx:if="{{selected_category==6}}">
+        <view wx:if="{{statement.category_id==6}}">
                 <text @tap="chooseCategory({{ 6 }})" class="selected-category" >其他</text>
         </view>
         <view wx:else>
@@ -88,7 +88,7 @@
       
       <view class="column">
         <text>备注</text>
-        <input class="remark" type="text" name="description" bindinput="handleDescInput" value="{{ statement.description }}" placeholder="本笔账单的简单说明"/>
+        <input class="remark" type="text" name="description" bindinput="handleDescInput" value="{{ statement.notes }}" placeholder="本笔账单的简单说明"/>
       </view>
  
 
@@ -122,6 +122,7 @@ export default class StatementFormComponent extends wepy.component {
           asset_id: 0,
           amount: '',
           description: '',
+          notes: '',
           date: '',
           address: '',
           time: '',
@@ -139,6 +140,7 @@ export default class StatementFormComponent extends wepy.component {
   }
 
   data = {
+    focus: true,
     nation: '',
     province: '',
     city: '',
@@ -147,10 +149,9 @@ export default class StatementFormComponent extends wepy.component {
     assets_labels: [],
     categories_labels: [],
     switchCheck: Session.get('getLocationSwitch') || false,
-    selected_category: 2,
   }
 
-  onLoad () {
+  onLoad (options) {
     this.statement.type = this.type
     if (this.statement.id === 0) {
       this.initTodayDate()
@@ -158,6 +159,7 @@ export default class StatementFormComponent extends wepy.component {
     }
     // this.guessCategory()
     // this.guessAsset()
+      
   }
 
   initTodayDate () {
@@ -224,7 +226,7 @@ export default class StatementFormComponent extends wepy.component {
       this.statement.amount = detail.value
     },
     handleDescInput ({ detail }) {
-      this.statement.description = detail.value
+      this.statement.notes = detail.value
     },
     setAsset (asset) {
       this.statement.asset_id = asset.id
@@ -235,12 +237,16 @@ export default class StatementFormComponent extends wepy.component {
       this.statement.record_type = category.name
     },
     chooseCategory (category) {
+       this.focus = false
+       this.$apply()
        //tip.toast(category)
        let categories = {1:'购物', 2: '吃喝', 3:'买菜', 4:'交通', 5:'娱乐', 6: '其他'}
        this.statement.record_type = categories[category]
        this.statement.category_id = category
 
-       this.selected_category = category
+       this.focus = true
+       this.$apply()
+
     },
     getLocation (e) {
       const locationSwitch = e.detail.value

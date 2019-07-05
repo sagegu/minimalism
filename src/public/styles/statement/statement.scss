@@ -141,8 +141,8 @@ page {
   .btn-save {
     margin:12px;
     button {
-      color: white;
-      background-color: #EC6464;
+      color: $primaryText;
+      background-color: $themeColor;
     }
   }
   .frequent-remarks {
@@ -160,11 +160,13 @@ page {
   .text-category {
       background-color: #ffffff;
       color: #000000;
+      padding:8rpx 54rpx;
+      margin: 0px 0rpx;
   }
 
   .selected-category {
-      background-color: #EC6464;
-      color: #ffffff;
+      background-color: $themeColor;
+      color: $primaryText;
       border-radius:4px;
       padding:8rpx 54rpx;
       margin: 0px 0rpx;

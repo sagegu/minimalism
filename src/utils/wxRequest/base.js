@@ -100,7 +100,6 @@ const doRequest = async (url, method, params, options = {}, callback) => {
   
   const thirdSession = await getOpenId()
 
-  console.log('url---------------', url) 
   console.log('params---------------', params) 
 
   var access = ''
@@ -121,15 +120,14 @@ const doRequest = async (url, method, params, options = {}, callback) => {
     },
   }).then((response) => {
 
-    console.log('url---------------', url) 
-    console.log('url+res---------------', response)
+    console.log('response url---------------', url) 
+    console.log('response---------------', response)
     const statusCode = response.statusCode
 
     var success = false
     if (statusCode === 200 || statusCode === 201 ) {
       success = true
     }
-    console.log('success---------------', success) 
 
     if ( !success ) {
       if (url === `${Host.url}/error_upload`) {
@@ -137,11 +135,12 @@ const doRequest = async (url, method, params, options = {}, callback) => {
       }
       let message = null
       if (statusCode != 500 && statusCode != 404) {
-        // message = e.errMsg
+         message = e.errMsg
       }
       Session.pushError({ url: url, method: method, params: params, err: message, statusCode: statusCode, time: new Date().toLocaleString()})
+      let errorInfo = url + message //+ '网络请求超时..'
       wx.showToast({
-        title: '网络请求超时..',
+        title: errorInfo,
         icon: 'none',
         duration: 3000
       })
