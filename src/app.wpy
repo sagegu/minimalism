@@ -203,7 +203,7 @@ export default class extends wepy.app {
 
       } else {
         console.log('else is ++++++++')
-        console.log(data)
+        console.log(data) 
       }
   }
 

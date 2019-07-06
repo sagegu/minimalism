@@ -86,7 +86,7 @@ page, .container{
 }
 
 .statement-list {
-  margin-bottom: 100rpx;
+  margin-bottom: 150rpx;
    
 }
 
@@ -103,14 +103,15 @@ page, .container{
     position: fixed;
     bottom: 0rpx;
     width: 100%;
-    height: 120rpx;
-    line-height: 120rpx;
+    height: 150rpx;
+    line-height: 150rpx;
     font-size: 32rpx;
     background: white;
     display: flex;
     justify-content: space-between;
     > text {
       min-width:100rpx;
+      height: 100rpx;
      }
   }
  
@@ -118,18 +119,16 @@ page, .container{
       background-color: $themeColor;
       color: $secondaryText;
       border-radius: 4px;
-      padding: 10rpx 74rpx;
+      padding: 28rpx 74rpx;
       margin-left: 50rpx;
-      height: 64rpx;
   }
 
   .text-category {
       background-color: #f6b44c;
       color: $secondaryText;
       border-radius: 4px;
-      padding: 10rpx 114rpx; 
+      padding: 28rpx 114rpx; 
       margin-right: 50rpx;
-      height: 64rpx;
   }
 
 .auth-float {

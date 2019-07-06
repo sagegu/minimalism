@@ -17,7 +17,7 @@
 
         <!-- 打卡 -->
         <view  class="pull-right share" >
-            <button open-type="share" >分享打卡</button>
+            <button open-type="share" @tap="share" >分享打卡</button>
         </view>
       </view>     
 
@@ -99,7 +99,7 @@
 
       headerTitle:  "当月支出",
 
-      userInfo: false,
+      userInfo: true,
       currentTotal: 0,
       submiting: false,
       currentPageIndex: 1,
@@ -120,18 +120,24 @@
       this.hasMoreData = true
       this.currentPageIndex  = 1
 
-      if (Session.get('login_unauthorized') !== null ) {
-         this.userInfo = Session.get('login_unauthorized')  
+      //会显示授权
+      if (Session.get('login_unauthorized') == 'true' ) {
+         this.userInfo = true   
       }
 
+      //getUserInfo看是否需要授权 
       this.postUser() 
 
-      if (Session.get('access')) {
+      if (Session.get('access') !== null) {
+      console.log('access is', Session.get('access'))
+      console.log('access is not null, getting book list')
                 //必须先获取challenge id
                   this.getChanllengeList()
                   this.getList()
                 
                   this.updateUI()
+      } else {
+        console.log('access is null')
       }
 
     }
@@ -143,8 +149,26 @@
       this.currentPageIndex  = 1
     }
     
-    onShareAppMessage () {
+    onShareAppMessage (e) {
+      if (e.from === 'menu') {
+        return {
+          title: '极简星球记账，专为极简主义者准备的记账本',
+          path: '/pages/index',
+          imageUrl: '../public/images/foward.jpeg',
+          success(e) {
 
+          },
+          fail(e) {
+
+          },
+          complete() {
+
+          }
+
+        }
+      } else {
+
+      }
     }
     
     onReachBottom () {
@@ -170,7 +194,6 @@
           if (this.userInfo) {
 
              this.postUser() 
-
                    
           }
         }else {
@@ -179,20 +202,23 @@
       },
       getPhoneNumber () {
       },
+      share() {
+        this.onShareAppMessage(1)
+      },
       async createZero () {
        if (this.submitting == true) {
         return
        }
        this.submiting = true
-       var booId = 1
+       var bookId = 1
        if (Session.get('current_book_id')) {
-          booId = Session.get('current_book_id')
+          bookId = Session.get('current_book_id')
        }
 
         const p = {'record_type': 6, 
                     'amount': 0,
                     'notes': '今日无消费'}
-        const result = await wxRequest.Post('books/' + booId + '/records/' , p)
+        const result = await wxRequest.Post('books/' + bookId + '/records/' , p)
                       
         if (result === undefined) {
           this.submiting = false
@@ -217,8 +243,6 @@
          bookId = Session.get('current_book_id')
          console.log('seesion bookId ++++++++++++++++', bookId)
       } 
-      console.log('bookId ++++++++++++++++', bookId)
-      console.log('books  ++++++++++++++++', books)
 
       for (var i = books.length - 1; i >= 0; i--) {
         if (books[i]['id'] == bookId) {
@@ -226,9 +250,6 @@
           this.bookTypeId = books[i]['book_type_id']
 
           this.currentTotal = books[i]['month_to_date_total']
-
-
-          console.log('books[i] ++++++++++++++++', books[i])
         }
       }
     }
@@ -252,7 +273,7 @@
           Session.set('login_unauthorized', 'false')
 
           this.userInfo = true
-          this.$apply()
+          this.$apply() 
           
           if (Session.get('access') === null) {
 
@@ -306,7 +327,7 @@
 
         if (Session.get('access') === null) {
           Session.set('access', data.access)
-                //必须先获取challenge id
+          //必须先获取challenge id
           //还没有默认选中的book id，不用getlist
           if (Session.get('current_book_id') === null ) {
             this.getChanllengeList()
@@ -314,7 +335,7 @@
           //this.getList()
                 
           this.updateUI()
-        }
+        } 
 
       } else {
         console.log('else is ++++++++')
@@ -339,12 +360,10 @@
       this.$apply()
     }
 
-    async getList() {
-          
-      console.log('this.list is ++++++++', this.list)
+    async getList() {          
       if (Session.get('index_load_cache1')) {
         this.list = Session.get('index_load_cache1')
-        this.$apply()
+        this.$apply() 
       }      
 
       // current total
@@ -359,15 +378,15 @@
 
       const res = store.getState().statement.statements
       
-      this.list = res.results 
+      this.list = res.results  
 
       if (res.book['book_type_id'] === 2) {
         this.currentTotal = res.book['month_to_date_total']
-        this.headerTitle = "当月支出"
+        this.headerTitle = '当月支出'
       }
       else {
         this.currentTotal = res.challenge['current_total']
-        this.headerTitle = "总支出"
+        this.headerTitle = '总支出'
         this.header.position_2_amount = res.challenge['target_amount']
 
         let left = this.header.position_2_amount - this.currentTotal
@@ -411,10 +430,10 @@
 
     async getChanllengeList() { 
       const data = await wxRequest.Get('users/self/books/' )
-      // if (typeof data !== 'undefined') {
-      //   return
-      // } else {
-      // } 
+      if (typeof data !== 'undefined') {
+         
+      } else {
+      } 
       
       //立刻保存数据，账本list，下面如果是初次使用，默认选择第一个
       Session.set('challenge_load_cache', data.results)
@@ -422,10 +441,11 @@
       console.log('getChanllengeList ++++++++++++++++', data)
 
       if (Session.get('current_book_id') === null ) {
-         // 估计是第一次登录，只有自己的账本，还没有session 
+         // 第一次登录，只有自己的账本，还没有session 
         var id = data.results[0]['id']
         Session.set('current_book_id', id)
-        console.log('nulllll   getChanllengeList ++++++++++++++++', id)
+       
+        console.log('第一次登录 current_book_id ++++++++++++++++', id)
 
         this.getList() 
         

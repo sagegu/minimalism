@@ -100,8 +100,6 @@ const doRequest = async (url, method, params, options = {}, callback) => {
   
   const thirdSession = await getOpenId()
 
-  console.log('params---------------', params) 
-
   var access = ''
   if (Session.get('access') !== null) {
     access = Session.get('access')
@@ -120,10 +118,9 @@ const doRequest = async (url, method, params, options = {}, callback) => {
     },
   }).then((response) => {
 
-    console.log('response url---------------', url) 
-    console.log('response---------------', response)
-    const statusCode = response.statusCode
+    console.log('response', url,response) 
 
+    const statusCode = response.statusCode
     var success = false
     if (statusCode === 200 || statusCode === 201 ) {
       success = true

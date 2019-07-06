@@ -9,8 +9,8 @@ page {
     line-height: 100rpx !important;
   }
   > .column {
-    height: 100rpx;
-    line-height: 100rpx;
+    height: 120rpx;
+    line-height: 120rpx;
     padding:0 44rpx;
     border-bottom: 1px solid #efefef;
     font-size: 28rpx;
@@ -31,8 +31,8 @@ page {
   }
 
   > .column-category {
-    height: 100rpx;
-    line-height: 100rpx;
+    height: 120rpx;
+    line-height: 120rpx;
     padding:0 44rpx;
     border-bottom: 0px solid #efefef;
     font-size: 28rpx;
@@ -160,15 +160,15 @@ page {
   .text-category {
       background-color: #ffffff;
       color: #000000;
-      padding:8rpx 54rpx;
-      margin: 0px 0rpx;
+      padding:20rpx 54rpx;
+      margin: 0px 10rpx;
   }
 
   .selected-category {
       background-color: $themeColor;
       color: $primaryText;
       border-radius:4px;
-      padding:8rpx 54rpx;
-      margin: 0px 0rpx;
+      padding:20rpx 54rpx;
+      margin: 0px 10rpx;
   }
 }

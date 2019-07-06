@@ -50,7 +50,7 @@
     }
     
 		data = {
-    	wallets: [{name: "", children: [ ]}], 
+    	wallets: [{name: '', children: [ ]}], 
 			netWorth: '0.00',
 			totalAssets: '0.00',
 			totalDebt: '0.00',
@@ -81,6 +81,8 @@
       this.getChanllengeList()
 		}
     
+     
+
     computed = {
       hiddenMoney () {
         return this.$parent.globalData.user.hidden_asset_money
@@ -99,9 +101,7 @@
          this.wallets[0].children.push(challenge[i])
         }  
       
-        this.$apply()
-        
-        console.log('session --- get getListChanllenge is ++++++++', this.wallets)
+        this.$apply()        
       }
 
       const data = await wxRequest.Get('users/self/books/' )
