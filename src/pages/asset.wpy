@@ -23,11 +23,11 @@
   </view>-->
 
   <view id="all-assets">
-    <view class="asset" wx:for="{{ wallets }}">
+    <view class="asset" wx:for="{{ wallets }}" wx:key="key">
       <view class="asset-header">
         <text >{{ item.name }}</text>
       </view>
-      <view class="column" wx:for="{{ item.children }}" bindtap="showAsset('{{ item.id }}')">
+      <view class="column" wx:for="{{ item.children }}" wx:key="key" bindtap="showAsset('{{ item.id }}')">
         <view class="money pull-right">{{ hiddenMoney ? '****' : item.amount }}</view>
         <view class="title">{{ item.name }}</view>
       </view>
@@ -43,7 +43,7 @@
   import wxRequest from '@/utils/wxRequest'
   export default class Wallet extends wepy.page {
     config = {
-      navigationBarTitleText: '挑战',
+      navigationBarTitleText: '我的账本',
       "usingComponents": {
         "i-spin": "../public/iview/spin/index"
       }
@@ -73,16 +73,27 @@
     }
 
 		onShow () {
-      if (Session.get('@asset_list_load_cache@')) {
-        // this.wallets = Session.get('@asset_list_load_cache@')
-        this.$apply()
-      }
+      // if (Session.get('@asset_list_load_cache@')) {
+      //   // this.wallets = Session.get('@asset_list_load_cache@')
+      //   this.$apply()
+      // }
 			//this.getAssets()
       this.getChanllengeList()
 		}
-    
-     
-
+   
+    onPullDownRefresh() { 
+      wx.setNavigationBarTitle({
+        title: '刷新中……'
+      })//动态设置当前页面的标题。
+   
+      wx.showNavigationBarLoading();//在当前页面显示导航条加载动画。
+   
+      this.getChanllengeList();//重新加载产品信息
+   
+      
+   
+    }
+ 
     computed = {
       hiddenMoney () {
         return this.$parent.globalData.user.hidden_asset_money
@@ -115,6 +126,16 @@
       for (var i = challenge.length - 1; i >= 0; i--) {
          this.wallets[0].children.push(challenge[i])
       }
+
+      wx.hideNavigationBarLoading();//隐藏导航条加载动画。
+   
+      wx.stopPullDownRefresh();//停止当前页面下拉刷新。
+   
+      console.log("关闭");
+   
+      wx.setNavigationBarTitle({
+        title: '我的账本'
+      })//动态设置当前页面的标题。
    }
 
 		async getAssets() {

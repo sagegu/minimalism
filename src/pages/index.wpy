@@ -5,20 +5,18 @@
           <text>{{ book }}  🔻 </text>
         </view>
 
-      <view class="level-2">
-        <view class="fs16">
-          <text>{{ headerTitle }}</text>
-        </view>
-        <view class="fs19 today-expend">{{ currentTotal }}</view>
-        <view class="overflow-hide" wx:if="{{ bookTypeId==1 }}">  
-          <view class="pull-left fs13">{{ header.position_2_human_name }} {{ header.position_2_amount }}, {{ header.position_3_human_name }} {{ header.position_3_amount }} 
-          </view>
-        </view> 
-
         <!-- 打卡 -->
         <view  class="pull-right share" >
             <button open-type="share" @tap="share" >分享打卡</button>
         </view>
+
+      <view class="level-2">
+        <view class="fs32 today-expend">{{ currentTotal }}</view>
+        <view class="fs13 amount-expend"> <text>{{ headerTitle }}</text> </view>
+        <view class="overflow-hide" wx:if="{{ bookTypeId==1 }}">  
+          <view class="pull-left fs13">{{ header.position_2_human_name }} {{ header.position_2_amount }} {{ header.position_3_human_name }} {{ header.position_3_amount }} 
+          </view>
+        </view> 
       </view>     
 
       <i-notice-bar icon="systemprompt" wx:if="{{ header.show_notice_bar }}">
@@ -78,9 +76,10 @@
   import { getStore } from 'wepy-redux'
   import { asyncList } from '@/store/actions'
   import Tip from '@/utils/tip'
+  import Util from '@/utils/util.js'
   export default class Index extends wepy.page {
     config = {
-      navigationBarTitleText: '首页',
+      navigationBarTitleText: '极简星球记账',
       "usingComponents": {
         "i-notice-bar": "../public/iview/notice-bar/index"
       }
@@ -95,15 +94,16 @@
       // list: [ {id: '1', description: '今天很能花', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'},
       //        {id: '1', description: '雪顶咖啡', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'}  ],
       list: [],
-      header: { position_2_human_name: "挑战金额", position_2_amount: " ", position_3_human_name:"结余", position_3_amount: " " },
+      header: { position_2_human_name: "挑战金额：", position_2_amount: " ", position_3_human_name:"；  结余：", position_3_amount: " " },
 
       headerTitle:  "当月支出",
 
       userInfo: true,
-      currentTotal: 0,
+      currentTotal: '',
       submiting: false,
       currentPageIndex: 1,
       hasMoreData: true,
+      isFirstOnShow: true,
     }
 
     components = {
@@ -123,30 +123,37 @@
       //会显示授权
       if (Session.get('login_unauthorized') == 'true' ) {
          this.userInfo = true   
+      } 
+      
+      if (Session.get('index_load_cache1')) {
+        this.list = Session.get('index_load_cache1')
+      }      
+
+      // current total
+      if (Session.get('current_total_load_cache')) {
+        this.currentTotal = Session.get('current_total_load_cache')
       }
-
-      //getUserInfo看是否需要授权 
-      this.postUser() 
-
-      if (Session.get('access') !== null) {
-      console.log('access is', Session.get('access'))
-      console.log('access is not null, getting book list')
-                //必须先获取challenge id
-                  this.getChanllengeList()
-                  this.getList()
-                
-                  this.updateUI()
-      } else {
-        console.log('access is null')
+      if ( this.isFirstOnShow ) {
+        //getUserInfo看是否需要授权 
+        this.postUser()  
       }
+      this.updateUI() 
 
+      if (Session.get('access') != null) {
+         this.token()
+      } 
+      this.isFirstOnShow = false
     }
 
     onPullDownRefresh() {
-      this.getList()       
-      console.log('onPullDownRefresh  ++++++++')
       this.hasMoreData = true
       this.currentPageIndex  = 1
+      wx.setNavigationBarTitle({
+        title: '刷新中……'
+      })//动态设置当前页面的标题。
+   
+      wx.showNavigationBarLoading();//在当前页面显示导航条加载动画。
+      this.getList()       
     }
     
     onShareAppMessage (e) {
@@ -155,25 +162,15 @@
           title: '极简星球记账，专为极简主义者准备的记账本',
           path: '/pages/index',
           imageUrl: '../public/images/foward.jpeg',
-          success(e) {
-
-          },
-          fail(e) {
-
-          },
-          complete() {
-
-          }
-
+          success(e) { },
+          fail(e) { },
+          complete() { }
         }
-      } else {
-
       }
     }
     
     onReachBottom () {
       this.getMoreList()
-
     }
 
     methods = {
@@ -192,9 +189,7 @@
           console.log('用户点击了授权按钮')
 
           if (this.userInfo) {
-
              this.postUser() 
-                   
           }
         }else {
           console.log('用户点击了取消按钮')
@@ -206,10 +201,36 @@
         this.onShareAppMessage(1)
       },
       async createZero () {
+
+        const myDate = new Date()
+        let today = myDate.getDate()
+       for (var i = this.list.length - 1; i >= 0; i--) {
+          let date = Util.convertStrToDate(this.list[i].created_at)
+          let day = date.getDate()
+          if (day == today) {
+            if (this.list[i].notes == '今日无消费') {
+               wx.showToast({
+                title: '太棒了，我记下了',
+                icon: 'none',
+                duration: 3000
+               })
+               return 
+            } 
+            if (this.list[i].amount > 0) {
+              wx.showToast({
+                title: '您今日已经有消费',
+                icon: 'none',
+                duration: 3000
+               })
+               return
+            }
+         } 
+       }
        if (this.submitting == true) {
         return
        }
        this.submiting = true
+
        var bookId = 1
        if (Session.get('current_book_id')) {
           bookId = Session.get('current_book_id')
@@ -236,12 +257,10 @@
       var books = []
       if (Session.get('challenge_load_cache')) {
          books = Session.get('challenge_load_cache')
-         console.log('seesion books ++++++++++++++++', books)
       }
       var bookId = 1
       if (Session.get('current_book_id') !== null) {
          bookId = Session.get('current_book_id')
-         console.log('seesion bookId ++++++++++++++++', bookId)
       } 
 
       for (var i = books.length - 1; i >= 0; i--) {
@@ -250,6 +269,7 @@
           this.bookTypeId = books[i]['book_type_id']
 
           this.currentTotal = books[i]['month_to_date_total']
+          return
         }
       }
     }
@@ -262,55 +282,56 @@
         const wxLogin1 =  wepy.login().then((resp) => {
           console.log('2login code record is ++++++++', resp)
         })
-
         wepy.getUserInfo().then((response) => {  
-
           this.globalData.user = response.userInfo
           response.userInfo['js_code'] = loginResponse.code
  
           console.log('getUserInfo ++++++++', response)
 
           Session.set('login_unauthorized', 'false')
-
           this.userInfo = true
           this.$apply() 
-          
-          if (Session.get('access') === null) {
-
+          //重新登录
+          if (Session.get('access') == null) {
+              Tip.loading('加载中...')
               this.login()
           }
-
-
       }, (err) => {
-          console.log('getUserInfo err ++++++++', err)
-
           this.userInfo = false  
           this.$apply()
           Session.set('login_unauthorized', 'false')
-      }) 
-
-              // Session.set('access', data.access)
- 
+      })
     }) 
   }
 
+    async token() {//检查token是否过期
+      let access = Session.get('access')
+      const result = await wxRequest.Post('token/verify/', { 'token' : access})
+     if (result == undefined) {
+        let refresh = Session.get('refresh')
+        if (refresh == null) {
+
+          this.login()
+
+        } else {
+          const refreshResult = await wxRequest.Post('token/refresh/', { 'refresh' : refresh})
+          //用refresh换取新的access
+          if (refreshResult == undefined) {
+
+             this.login() 
+ 
+          } else {
+            Session.set('access', refreshResult.access)
+            this.getChanllengeList()
+          }
+             
+         }
+     } else {
+        this.getChanllengeList()
+     }
+    }
+
    async login() {
-      var city = this.globalData.user['city']
-      if (city.length == 0) {
-        city = 'a city'
-      }
-      var province = this.globalData.user['province']
-      if (province.length == 0) {
-        province = 'a province'
-      }
-      var country = this.globalData.user['country']
-      if (country.length == 0) {
-        country = 'a country'
-      }
-      var language = this.globalData.user['language']
-      if (language.length == 0) {
-        language = 'a language'
-      }
       const data = await wxRequest.Post('simple-wechat-login/', {
                 'js_code': this.globalData.user['js_code'],
                  'avatar_url': this.globalData.user['avatarUrl'],
@@ -320,64 +341,26 @@
                  'country': country,
                  'gender': this.globalData.user['gender'],
                  'language': language})
-
-      if (typeof data !== 'undefined') {
-
+      if (typeof data != 'undefined') {
         this.globalData.user = data
 
-        if (Session.get('access') === null) {
           Session.set('access', data.access)
-          //必须先获取challenge id
-          //还没有默认选中的book id，不用getlist
-          if (Session.get('current_book_id') === null ) {
-            this.getChanllengeList()
-          }
-          //this.getList()
-                
-          this.updateUI()
-        } 
-
+          Session.set('refresh', data.refresh)
+          
+          //先获取booklist 还没有默认选中的book id，不用getlist
+          this.getChanllengeList()
+ 
       } else {
         console.log('else is ++++++++')
         console.log(data)
+        Tip.loaded()
       }
   }
 
-
-    async getHeader () {
-      if (Session.get('header_load_cache')) {
-        this.header = Session.get('header_load_cache')
-        this.$apply()
-      }
-
-      const data = await wxRequest.Get('header')
-      if (data === undefined) {
-        return false
-      }
-
-      this.header = data
-      Session.set('header_load_cache', this.header)
-      this.$apply()
-    }
-
-    async getList() {          
-      if (Session.get('index_load_cache1')) {
-        this.list = Session.get('index_load_cache1')
-        this.$apply() 
-      }      
-
-      // current total
-      if (Session.get('current_total_load_cache')) {
-        this.currentTotal = Session.get('current_total_load_cache')
-        this.$apply()
-      }
-
-      const store = getStore()
+    async getList() {    
+      const store = getStore() 
       const result = await store.dispatch(asyncList())
-      
-
-      const res = store.getState().statement.statements
-      
+      const res = store.getState().statement.statements   
       this.list = res.results  
 
       if (res.book['book_type_id'] === 2) {
@@ -397,6 +380,18 @@
 
       Session.set('current_total_load_cache', this.currentTotal)
       this.$apply()
+
+      Tip.loaded()
+
+      wx.hideNavigationBarLoading();//隐藏导航条加载动画。
+   
+      wx.stopPullDownRefresh();//停止当前页面下拉刷新。
+   
+      console.log("关闭");
+   
+      wx.setNavigationBarTitle({
+        title: '极简星球记账'
+      })//动态设置当前页面的标题。
     }
 
     async getMoreList() {
@@ -428,34 +423,40 @@
       this.$apply()
     }
 
-    async getChanllengeList() { 
+    async getChanllengeList() {  
       const data = await wxRequest.Get('users/self/books/' )
-      if (typeof data !== 'undefined') {
-         
+      if (data == undefined) {
+         self.login()
       } else {
+        //立刻保存数据，账本list，下面如果是初次使用，默认选择第一个
+        Session.set('challenge_load_cache', data.results)
+
+        // 第一次登录，只有自己的账本，还没有session 
+        let bookid = Session.get('current_book_id')
+        if (bookid == null ) {
+          var id = data.results[0]['id']
+          Session.set('current_book_id', id)
+          console.log('重新登录current_book_id ++++++++++++++++', id)
+         } else {
+          //如果本地有bookid，验证是否合格 
+          let verified = false
+          let book = data.results
+          for (var i = book.length - 1; i >= 0; i--) {
+             if (bookid == book[i].id) {
+                verified = true
+                break
+              }
+          }
+          if (!verified) {
+             var id = data.results[0]['id']
+             Session.set('current_book_id', id)
+          }
+        }
+        //get list
+        this.getList()
       } 
-      
-      //立刻保存数据，账本list，下面如果是初次使用，默认选择第一个
-      Session.set('challenge_load_cache', data.results)
-
-      console.log('getChanllengeList ++++++++++++++++', data)
-
-      if (Session.get('current_book_id') === null ) {
-         // 第一次登录，只有自己的账本，还没有session 
-        var id = data.results[0]['id']
-        Session.set('current_book_id', id)
-       
-        console.log('第一次登录 current_book_id ++++++++++++++++', id)
-
-        this.getList() 
-        
-        this.updateUI() 
-
-      } else {
-
-      }
- 
-       
+      Tip.loaded() 
+      this.updateUI()
    }
 
     computed = {

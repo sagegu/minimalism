@@ -7,7 +7,7 @@
       <view class="st-title">
         <view class="title">{{ statement.record_type }} {{ statement.category }}</view>
         <!-- <view class="description" wx:if="{{statement.description}}">{{ statement.description }}</view> --> <!-- · -->
-        <view class="time">{{  statement.created_at_date }}  {{ statement.notes }}  {{ statement.asset }}</view>
+        <view class="time">{{  statement.created_at_date }}  {{ statement.notes }} </view>
       </view>
     </view>
     <view class="amount"> {{ statement.amount }} </view>

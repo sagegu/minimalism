@@ -1,5 +1,7 @@
+@import '.././_variable.scss';
+
 page {
-  background: #F4F4F4;
+  background: white;
   height: 100%;
 }
 .container {
@@ -10,7 +12,7 @@ page {
     align-items: center;
     justify-content: space-between;
     border-bottom: 2rpx dashed #999;
-    padding: 16rpx 0 40rpx 0;
+    padding: 16rpx 40rpx;
     > view {
       display: flex;
       align-items: center;
@@ -25,9 +27,10 @@ page {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 16rpx 0;
+    margin: 22rpx 0 0 0;
+    padding: 22rpx 40rpx;
     color: #999;
-    font-size: 14px;
+    font-size: 12px;
     > view {
       display: flex;
       flex: 2;
@@ -64,6 +67,14 @@ page {
   }
 }
 
+.btn-save {
+    margin:12px;
+    button {
+      color: $secondaryText;
+      background-color: $themeColor;
+    }
+  }
+
 .button-groups {
   position: absolute;
   bottom: 0;
@@ -73,7 +84,18 @@ page {
   height: 150rpx;
   line-height: 100rpx;
   display: flex;
+
   > view {
+    font-weight: bolder;
+    background-color: $themeColor;
+    color: $secondaryText;
+    border-radius: 4px;
+    padding: 28rpx 40rpx;
+    left: 22rpx;
+    right: 22rpx;  
+    bottom: 22rpx;
+    height: 80rpx;
+    position: fixed;
     flex: 1;
     font-size: 28rpx;
     display: flex;

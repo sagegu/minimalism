@@ -5,81 +5,6 @@ import Session from '@/utils/session'
 // 登录重试次数
 let retryCount = 0
 
-// 登录凭证键值
-const loginKey = Session.key.login
-let getAuthPromise = null
-
-// 获取 openid
-const getOpenId = async () => {
-  if (Session.get(loginKey) !== null) {
-    return Session.get(loginKey)
-  }
-
-  // 防止并发请求 openid
-  if (getAuthPromise) {
-    return getAuthPromise
-  }
-
- //  return getAuthPromise = new Promise(async (resolve, reject) => {
- //    const wxLogin = await wepy.login()
- //    console.log('1---------------', wxLogin.code)
- //    const res = await wepy.request({
- //      url: Host.login,
- //      method: 'POST',
- //      data: {'js_code': wxLogin.code,'avatar_url': '123111',
- // 'nick_name': '123111',
- // 'city': '123111',
- // 'province': '123111',
- // 'country': '123111',
- // 'gender': '1',
- // 'language': '123111'},
- //    }).then((response) => {
- //            const result = response.data
-
- //          console.log('result---------------', result)
- //          console.log('access---------------',result.access)
-
-///////////////////record
-//            const creatone = await wepy.request({
-//       url: Host.url+'/records',
-//       method: 'POST',
-//       data: {'record_type': 1,'amount': '123111', },
-//       header:{ 'Authorization':  'Bearer '+ result.access,
-//       'content-type': 'application/json',
-// }
-//     }).then((response) => {
-      
-//           console.log('---------------', response)
-
-//     }, (err) => {
-//     // Session.pushError({ url: url, method: method, params: params, err: err.message, time: new Date().toLocaleString()})
-//     // wx.showToast({
-//     //   title: '请求不可达',
-//     //   icon: 'none',
-//     //   duration: 3000
-//     // })
-//               console.log('err---------------', err)
-
-//   })
-
-  //   }, (err) => {
-  //   // Session.pushError({ url: url, method: method, params: params, err: err.message, time: new Date().toLocaleString()})
-  //   // wx.showToast({
-  //   //   title: '请求不可达',
-  //   //   icon: 'none',
-  //   //   duration: 3000
-  //   // })
-  //             console.log('s---------------', err) 
-
-  // })
-
-  //   resolve(res )
-  // })
-
-
-  
-
-}
 
 const doRequest = async (url, method, params, options = {}, callback) => {
   let cacheKey = ''
@@ -98,7 +23,6 @@ const doRequest = async (url, method, params, options = {}, callback) => {
     }
   }
   
-  const thirdSession = await getOpenId()
 
   var access = ''
   if (Session.get('access') !== null) {
@@ -111,15 +35,11 @@ const doRequest = async (url, method, params, options = {}, callback) => {
     data: params, 
     header: {
       'Content-Type': 'application/json',
-      'X-WX-Skey': thirdSession,
       'X-WX-APP-ID': Host.appid,
       'X-WX-PAGES': pageRoutes.join(','),
       'Authorization':  'Bearer ' + access,
     },
   }).then((response) => {
-
-    console.log('response', url,response) 
-
     const statusCode = response.statusCode
     var success = false
     if (statusCode === 200 || statusCode === 201 ) {
@@ -127,21 +47,23 @@ const doRequest = async (url, method, params, options = {}, callback) => {
     }
 
     if ( !success ) {
+      //console.log('ERROR response', url,response) 
       if (url === `${Host.url}/error_upload`) {
         return false
       }
-      let message = null
+      let message = 'error: '+ response.errMsg 
       if (statusCode != 500 && statusCode != 404) {
-         message = e.errMsg
+         message = response.errMsg
       }
       Session.pushError({ url: url, method: method, params: params, err: message, statusCode: statusCode, time: new Date().toLocaleString()})
-      let errorInfo = url + message //+ '网络请求超时..'
+      let errorInfo = url + ', return: ' + response.data.detail //+ '网络请求超时..'
       wx.showToast({
         title: errorInfo,
         icon: 'none',
         duration: 3000
       })
     } else {
+      //console.log('SUCCESS response', url,response) 
       const result = response.data
       // key 过期尝试重连
       if (result.status === 301 && retryCount <= 3) {
@@ -150,7 +72,6 @@ const doRequest = async (url, method, params, options = {}, callback) => {
         return doRequest(url, method, params)
       }
 
-      Session.set(loginKey, thirdSession)
       if(cacheKey != '') setByCache(cacheKey, result)
 
       if (typeof callback !== 'undefined') {
@@ -160,8 +81,9 @@ const doRequest = async (url, method, params, options = {}, callback) => {
     }
   }, (err) => {
     Session.pushError({ url: url, method: method, params: params, err: err.message, time: new Date().toLocaleString()})
+    let errorInfo = '请求不可达' + url + err.message
     wx.showToast({
-      title: '请求不可达',
+      title: errorInfo,
       icon: 'none',
       duration: 3000
     })
@@ -173,7 +95,6 @@ const wxUpload = async (url, filePath, params = {}) => {
     url: url,
     header: { 
       'Content-Type': 'application/json',
-      'X-WX-Skey': await getOpenId(),
       'X-WX-APP-ID': Host.appid
     },
     filePath: filePath,

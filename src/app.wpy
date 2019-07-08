@@ -1,5 +1,7 @@
 <script>
 import wepy from 'wepy'
+import * as sentry from 'sentry-mina/browser/sentry-mina.js'
+import sentryMina from 'sentry-mina/browser/sentry-mina'
 import 'wepy-async-function'
 import { setStore, getStore } from 'wepy-redux'
 import configStore from './store'
@@ -72,9 +74,9 @@ export default class extends wepy.app {
       "navigationBarBackgroundColor": "#ffffff",
       "navigationBarTextStyle": "black",
       "backgroundTextStyle": "light",
-      "navigationBarTitleText": "洁账",
+      "navigationBarTitleText": "极简星球",
       // navigationBarTextStyle: "white",
-      "enablePullDownRefresh": false
+      "enablePullDownRefresh": true
     },
     // tabBar: {
     //   backgroundColor: "#fff",
@@ -129,6 +131,37 @@ export default class extends wepy.app {
     // this.checkVersionUpdate()
     // this.uploadData()
     // this.postUser()
+/*
+// config Sentry
+sentry.init({
+  dsn: 'https://30c39f165fb7449cb1b5051ba29bad22@sentry.io/1498441'
+})
+
+// Set user information, as well as tags and further extras
+sentry.configureScope(scope => {
+  scope.setUser({ id: '4711' });
+  scope.setTag('user_mode', 'admin');
+  scope.setExtra('battery', 0.7);
+  // scope.clear();
+});
+
+// Add a breadcrumb for future events
+sentry.addBreadcrumb({
+  message: 'My Breadcrumb',
+  // ...
+});
+
+// Capture exceptions, messages or manual events
+sentry.captureMessage('Hello, world!');
+sentry.captureException(new Error('Good bye'));
+sentry.captureEvent({
+  message: 'Manual',
+  stacktrace: [
+    // ...
+  ],
+});
+*/
+
   }
 
   // 预加载用户

@@ -3,8 +3,7 @@
     <view class="container">
       <view class="title">
         <view>
-          <image class="icon" src="{{ statement.category_icon }}"></image>
-          <text>{{ statement.record_type }}</text>
+           <text>{{ statement.record_type }}</text>
         </view>
         <text class="{{statement.type}}">{{ statement.type == 'expend' ? '-' : '+' }} {{ statement.amount }}</text>
       </view>
@@ -69,16 +68,18 @@
       </view> -->
     </view>
 
-    <view class="button-groups">
-<!--       <view class="delete-button" @tap="del">
+
+  <!--    <view class="button-groups">
+     <view class="delete-button" @tap="del">
         <view class="iconfont jz-icon-delete"></view>
         <text>删除</text>
-      </view> -->
-      <view class="edit-button" @tap="edit">
-        <view class="iconfont jz-icon-edit"></view>
-        <text>编辑</text>
-      </view>
-    </view>
+      </view> 
+      <view @tap="edit">  <text  >编辑</text> </view>
+    </view>-->
+
+     <view class="btn-save" @tap="edit"><button >编辑</button>
+     </view>
+
   </view>
 </template>
 
