@@ -3,7 +3,9 @@
     <view class="container">
       <view class="column money">
         <text class="fs20">{{ statement.record_type }}</text>
-        <input class="money-input {{ statement.type }}" placeholder="0.00" placeholder-class="{{ statement.type }}" bindinput="handleAmountInput" name="amount" type="digit"  focus="{{ focus }}" value="{{ statement.amount }}"/>
+        <!-- <input class="money-input {{ statement.type }}" placeholder="0.00" placeholder-class="{{ statement.type }}" bindinput="handleAmountInput" name="amount" type="digit"   value="{{ statement.amount }}"/> --> <!-- focus="{{ focus }}" -->
+
+        <text class="money-input" bindinput="handleAmountInput" >{{ statement.amount }}</text>
       </view>
 
       <view class="column-category" > 
@@ -91,12 +93,31 @@
         <input class="remark" type="text" name="description" bindinput="handleDescInput" value="{{ statement.notes }}" placeholder="本笔账单的简单说明"/>
       </view>
  
+      <view class='keyboard'>
+        <view class='left number'>
+            <view data-key="1" hover-class='active' hover-stay-time='100' bindtap='inputPassword'>1</view>
+            <view data-key="2" hover-class='active' hover-stay-time='100' bindtap='inputPassword'>2</view>
+            <view data-key="3" hover-class='active' hover-stay-time='100' bindtap='inputPassword'>3</view>
+            <view data-key="4" hover-class='active' hover-stay-time='100' bindtap='inputPassword'>4</view>
+            <view data-key="5" hover-class='active' hover-stay-time='100' bindtap='inputPassword'>5</view>
+            <view data-key="6" hover-class='active' hover-stay-time='100' bindtap='inputPassword'>6</view>
+            <view data-key="7" hover-class='active' hover-stay-time='100' bindtap='inputPassword'>7</view>
+            <view data-key="8" hover-class='active' hover-stay-time='100' bindtap='inputPassword'>8</view>
+            <view data-key="9" hover-class='active' hover-stay-time='100' bindtap='inputPassword'>9</view>
+            <view data-key="." hover-class='active' hover-stay-time='100' bindtap='clean'>清空</view>
+            <view data-key="." hover-class='active' hover-stay-time='100' bindtap='inputPassword'>.</view>
+            <view data-key="0" hover-class='active' hover-stay-time='100' bindtap='inputPassword'>0</view>
+        </view>
+         <view class='right ctr-btn'>
+            <view class='ctr-btn-item' hover-class='active' hover-stay-time='100' bindtap='deleteLast'>删除</view>
+            <view class='ctr-btn-item-save' hover-class='active' hover-stay-time='100' >
+                   <button class='ctr-btn-item-save' wx:if="{{ !submiting }}" formType="submit">保存</button>
+                    <button wx:else>保存中...</button>
+            </view>
+        </view>  
+    </view> 
 
-      <view class="btn-save">
-        <button wx:if="{{ !submiting }}" formType="submit">保存</button>
-        <button wx:else>保存中...</button>
-        <input hidden name="type" value="{{ statement.type }}"/>
-      </view>
+
     </view>
   </form>
 </template>
@@ -120,7 +141,7 @@ export default class StatementFormComponent extends wepy.component {
           type: 'expend',
           category_id: 2,
           asset_id: 0,
-          amount: '',
+          amount: 0,
           description: '',
           notes: '',
           date: '',
@@ -151,16 +172,23 @@ export default class StatementFormComponent extends wepy.component {
     switchCheck: Session.get('getLocationSwitch') || false,
   }
 
+  events = {
+      'htmlParser-broadcast': ($event, ...args) => {
+          // console.log('----broadcastb---')
+         this.submiting = false
+         this.$apply()
+      },
+
+  }
+
   onLoad (options) {
     this.statement.type = this.type
     if (this.statement.id === 0) {
       this.initTodayDate()
       // if (this.switchCheck) this.setLocation()
     }
-    // this.guessCategory()
-    // this.guessAsset()
-      
   }
+
 
   initTodayDate () {
     const myDate = new Date()
@@ -213,6 +241,34 @@ export default class StatementFormComponent extends wepy.component {
   }
 
   methods = {
+    inputPassword (e) {
+      let key=e.currentTarget.dataset.key
+      let a = this.statement.amount
+      if((a.length == 1 || a.length == undefined) && a==0){
+        a = key
+      } else {
+        a = a + key
+      }
+      this.statement.amount = a
+      this.$apply()
+    },
+    clean () {
+      this.statement.amount = 0
+      this.$apply()
+    },
+    deleteLast () {
+      var amount = this.statement.amount
+      if (amount.length == 0 || amount.length == undefined) {
+        return
+      } 
+      amount = amount.substr(0,amount.length-1)
+      if (amount.length == 0) {
+        amount = 0
+      }
+
+      this.statement.amount = amount
+      this.$apply()
+    },
     dateChange({ detail }) {
       this.statement.date = detail.value
     },
@@ -237,16 +293,9 @@ export default class StatementFormComponent extends wepy.component {
       this.statement.record_type = category.name
     },
     chooseCategory (category) {
-       this.focus = false
-       this.$apply()
-       //tip.toast(category)
        let categories = {1:'购物', 2: '吃喝', 3:'买菜', 4:'交通', 5:'娱乐', 6: '其他'}
        this.statement.record_type = categories[category]
        this.statement.category_id = category
-
-       this.focus = true
-       this.$apply()
-
     },
     getLocation (e) {
       const locationSwitch = e.detail.value
@@ -259,9 +308,8 @@ export default class StatementFormComponent extends wepy.component {
         this.$apply()
       }
     },
-    
     async formSubmit ({ detail }) {
-      const statement = detail.value
+      const statement = this.statement// detail.value
       if (statement.amount == 0 || statement.amount == '') {
         tip.error('金额不能为零')
         return false
@@ -276,7 +324,9 @@ export default class StatementFormComponent extends wepy.component {
       //   tip.error('未选择账户')
       //   return false
       // }
+      statement['description'] = this.statement.notes
       statement['category_id'] = this.statement.category_id
+      //console.log('s', statement)
       // statement.upload_files = this.statement.upload_files
       this.$emit('submit', statement, detail)
     },

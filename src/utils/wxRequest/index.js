@@ -5,6 +5,7 @@ const Put = async (url, params, options = {}) => await Base.doRequest(`${Host.ur
 const Post = async (url, params, options = {}) => await Base.doRequest(`${Host.url}/${url}`, 'Post', params, options)
 const Destroy = async (url, params, options = {}) => await Base.doRequest(`${Host.url}/${url}`, 'DELETE', params, options)
 const Upload = async (filePath, params = {}) => await Base.wxUpload(`${Host.url}/upload`, filePath, params)
+const Download = async (filePath, params = {}) => await Base.wxUpload(`${Host.url}/${url}`, filePath, params)
 
 const GetBasic = (url, params, options = {}, callback) => Base.doRequest(`${Host.url}/${url}`, 'GET', params, options, callback)
 const PostBasic = (url, params, options = {}, callback) => Base.doRequest(`${Host.url}/${url}`, 'Post', params, options, callback)

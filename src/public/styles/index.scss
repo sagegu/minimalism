@@ -119,8 +119,10 @@ page, .container{
     background-color: $themeColor;
     color: $secondaryText;
     border-radius: 4px;
-    padding: 28rpx 80rpx;
+    padding: 12rpx 80rpx;
     margin: 5rpx 0rpx;
+    font-size: 32rpx;
+    font-weight: bolder;
     left: 22rpx; 
     position: fixed;
 }
@@ -130,7 +132,7 @@ page, .container{
     color: white;
     font-weight: bolder;
     border-radius: 4px;
-    padding: 28rpx 122rpx; 
+    padding: 30rpx 122rpx; 
     margin: 5rpx 0rpx;
     right: 30rpx; 
     position: fixed;
@@ -156,7 +158,7 @@ page, .container{
   }
 }
 
-.share {
+.share-everyday {
   position: absolute;
   right: 30rpx;  
   top: 24rpx;
@@ -170,5 +172,31 @@ page, .container{
       color: white;
       font-weight: bolder;
       border-radius: 4px;
+  }
+}
+
+.share-float {
+  position: fixed;
+  right:0rpx;
+  bottom:0rpx;
+  left:0rpx;
+  top:0rpx;
+  text-align: center;
+  background: #ffffff;
+  image { 
+   position: fixed;
+   bottom: 10rpx;
+   left: 10rpx;
+   right: 10rpx;
+  }
+  button {
+   width:300rpx;
+  height: 50rpx;
+   background: #4fae71;
+   color: white;
+  position: fixed;
+   bottom: 10rpx;
+   left:10rpx;
+   right:10rpx;
   }
 }

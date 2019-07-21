@@ -28,70 +28,96 @@ const doRequest = async (url, method, params, options = {}, callback) => {
   if (Session.get('access') !== null) {
     access = Session.get('access')
   }
-
-  return wepy.request({
-    url: url,
-    method: method,
-    data: params, 
-    header: {
+  let header = {
       'Content-Type': 'application/json',
       'X-WX-APP-ID': Host.appid,
       'X-WX-PAGES': pageRoutes.join(','),
       'Authorization':  'Bearer ' + access,
-    },
+    }
+  return wepy.request({
+    url: url,
+    method: method,
+    data: params, 
+    header: header,
   }).then((response) => {
     const statusCode = response.statusCode
     var success = false
-    if (statusCode === 200 || statusCode === 201 ) {
+    if (statusCode === 200 || statusCode === 201 || statusCode === 204 ) {
       success = true
     }
+   
+    // console.log('response',header, success, url,response) 
+
+      //no more error toast
 
     if ( !success ) {
-      //console.log('ERROR response', url,response) 
-      if (url === `${Host.url}/error_upload`) {
-        return false
-      }
-      let message = 'error: '+ response.errMsg 
-      if (statusCode != 500 && statusCode != 404) {
-         message = response.errMsg
-      }
-      Session.pushError({ url: url, method: method, params: params, err: message, statusCode: statusCode, time: new Date().toLocaleString()})
-      let errorInfo = url + ', return: ' + response.data.detail //+ '网络请求超时..'
-      wx.showToast({
-        title: errorInfo,
-        icon: 'none',
-        duration: 3000
-      })
+      // if (url === `${Host.url}/error_upload`) {
+      //   return false
+      // }
+      // let message = 'error: '+ response.errMsg 
+      // if (statusCode != 500 && statusCode != 404) {
+      //    message = response.errMsg
+      // }
+      // Session.pushError({ url: url, method: method, params: params, err: message, statusCode: statusCode, time: new Date().toLocaleString()})
+      // let errorInfo = url + ', return: ' + response.data.detail //+ '网络请求超时..'
+      // wx.showToast({
+      //   title: errorInfo,
+      //   icon: 'none',
+      //   duration: 3000
+      // })
+      //statusCode == 400
+      let errorReturn = response.data['non_field_errors']
+      if (errorReturn.length > 0) {
+         wx.showToast({
+          title: errorReturn[0],
+          icon: 'none',
+          duration: 3000
+        })
+      } 
     } else {
-      //console.log('SUCCESS response', url,response) 
+
       const result = response.data
       // key 过期尝试重连
-      if (result.status === 301 && retryCount <= 3) {
-        Session.clear(loginKey)
-        retryCount += 1
-        return doRequest(url, method, params)
-      }
+      // if (result.status === 301 && retryCount <= 3) {
+      //   Session.clear(loginKey)
+      //   retryCount += 1
+      //   return doRequest(url, method, params)
+      // }
 
       if(cacheKey != '') setByCache(cacheKey, result)
 
       if (typeof callback !== 'undefined') {
         callback(result)
       }
+
       return result
     }
   }, (err) => {
-    Session.pushError({ url: url, method: method, params: params, err: err.message, time: new Date().toLocaleString()})
-    let errorInfo = '请求不可达' + url + err.message
-    wx.showToast({
-      title: errorInfo,
-      icon: 'none',
-      duration: 3000
-    })
+    // Session.pushError({ url: url, method: method, params: params, err: err.message, time: new Date().toLocaleString()})
+    // let errorInfo = '请求不可达' + url + err.message
+    // wx.showToast({
+    //   title: errorInfo,
+    //   icon: 'none',
+    //   duration: 3000
+    // })
   })
 }
 
 const wxUpload = async (url, filePath, params = {}) => {
   return await wepy.uploadFile({
+    url: url,
+    header: { 
+      'Content-Type': 'application/json',
+      'X-WX-APP-ID': Host.appid
+    },
+    filePath: filePath,
+    formData: params,
+    name: 'file'
+  })
+}
+
+const wxDownload = async (url, filePath, params = {}) => {
+  return await wepy.downloadFile({
     url: url,
     header: { 
       'Content-Type': 'application/json',

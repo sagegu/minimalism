@@ -8,6 +8,16 @@ function getCurrentDate() {
   return [year, month, day].join('-')
 }
 
+function getSimpleCurrentDate() {
+  const myDate = new Date()
+  // let year = myDate.getFullYear()
+  let month = myDate.getMonth() + 1
+  let day = myDate.getDate()
+  if (month < 10) month = `0${month}`
+  if (day < 10) day = `0${day}`
+  return [month, day].join('-')
+}
+
 function getCurrentTime() {
   const myDate = new Date()
   let min = myDate.getMinutes()
@@ -71,6 +81,7 @@ function convertStrToDate(datetimeStr) {
 
 module.exports = {
   getCurrentDate,
+  getSimpleCurrentDate,
   getCurrentTime,
   convertStrToDate
 }

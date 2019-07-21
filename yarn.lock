@@ -2838,10 +2838,6 @@ randomatic@^3.0.0:
     kind-of "^6.0.0"
     math-random "^1.0.1"
 
-raven-weapp@0.0.7:
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/raven-weapp/-/raven-weapp-0.0.7.tgz#a878c900177b23898803ea698ec49578c81effdb"
-
 rc@^1.1.2:
   version "1.2.8"
   resolved "https://registry.yarnpkg.com/rc/-/rc-1.2.8.tgz#cd924bf5200a075b83c188cd6b9e211b7fc0d3ed"
@@ -3662,6 +3658,10 @@ wepy-async-function@^1.4.4:
   dependencies:
     promise-polyfill "^6.0.2"
     regenerator-runtime "^0.10.3"
+
+wepy-com-progress-circle@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/wepy-com-progress-circle/-/wepy-com-progress-circle-1.0.3.tgz#b997f81c6faa05852dd4fab5ba9d64e2dd5b420d"
 
 wepy-com-toast@^1.0.2:
   version "1.0.2"

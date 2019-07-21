@@ -6,7 +6,7 @@
         </view>
 
         <!-- 打卡 -->
-        <view  class="pull-right share" >
+        <view  class="pull-right share-everyday" >
             <button open-type="share" @tap="share" >分享打卡</button>
         </view>
 
@@ -17,7 +17,7 @@
           <view class="pull-left fs13">{{ header.position_2_human_name }} {{ header.position_2_amount }} {{ header.position_3_human_name }} {{ header.position_3_amount }} 
           </view>
         </view> 
-      </view>     
+      </view>      
 
       <i-notice-bar icon="systemprompt" wx:if="{{ header.show_notice_bar }}">
         <navigator wx:if="{{ header.notice_bar_path }}" url="{{ header.notice_bar_path }}">
@@ -46,24 +46,38 @@
 <!-- 记账 -->
      <view class="column"> 
         <view >
-          <text wx:if="{{ !submiting }}" @tap="createZero" class="selected-category" >今日无消费</text>
-           <text wx:else class="selected-category">今日无消费...</text>
+          <text @tap="gotoCreate" class="text-category" >生成海报</text>
+        </view>
+        <view >
+          <button open-type="share" @tap="createZero" class="selected-category">无消费打卡</button>
+          <!-- <text wx:if="{{ !submiting }}" @tap="createZero" class="selected-category" >无消费打卡</text>
+           <text wx:else class="selected-category">无消费打卡...</text> -->
         </view>
         <view >
           <text @tap="gotoCreate" class="text-category" >记账</text>
         </view>
     </view>
 
-<!-- 请求授权 -->
-    <view wx:if="{{ !userInfo }}">  
-     <view class="auth-float">      
-      <image src="../public/images/nimumallogo.png"></image>
-<!--       <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">Get Phone</button>
- -->
-      <button open-type="getUserInfo" bindgetuserinfo="getUserInfo">开启极简星球账本</button>
+  <!-- 请求授权 -->
+      <view wx:if="{{ !userInfo }}">  
+       <view class="auth-float">      
+        <image src="../public/images/nimumallogo.png"></image>
+  <!--       <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">Get Phone</button>
+   -->
+        <button open-type="getUserInfo" bindgetuserinfo="getUserInfo">开启极简星球账本</button>
+      </view>
+    </view>
 
-    </view>
-    </view>
+  <!-- 分享 -->
+    <!--   <view>  
+       <view class="share-float">      
+        <image src="../public/images/forwardbg.png"></image>
+        <view >
+          <text @tap="gotoCreate" class="text-category" >太棒了</text>
+          <text @tap="gotoCreate" class="text-category" >邀请好友一起达成目标</text>
+        </view>
+       </view>
+    </view> -->
 
 </template>
 
@@ -94,7 +108,7 @@
       // list: [ {id: '1', description: '今天很能花', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'},
       //        {id: '1', description: '雪顶咖啡', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'}  ],
       list: [],
-      header: { position_2_human_name: "挑战金额：", position_2_amount: " ", position_3_human_name:"；  结余：", position_3_amount: " " },
+      header: { position_2_human_name: "挑战金额：", position_2_amount: 1000, position_3_human_name:"；  结余：", position_3_amount: " " },
 
       headerTitle:  "当月支出",
 
@@ -129,10 +143,17 @@
         this.list = Session.get('index_load_cache1')
       }      
 
-      // current total
+      // current total 
       if (Session.get('current_total_load_cache')) {
-        this.currentTotal = Session.get('current_total_load_cache')
+        var total = Session.get('current_total_load_cache')
+        total = total - 0
+        this.currentTotal = total.toFixed(1)
+
+        let left = this.header.position_2_amount - this.currentTotal
+        this.header.position_3_amount = left < 0 ? 0 : left.toFixed(1)
+
       }
+
       if ( this.isFirstOnShow ) {
         //getUserInfo看是否需要授权 
         this.postUser()  
@@ -186,13 +207,13 @@
       getUserInfo (res) {
         this.userInfo = true
         if(res.detail.userInfo) {
-          console.log('用户点击了授权按钮')
+          // console.log('用户点击了授权按钮')
 
           if (this.userInfo) {
              this.postUser() 
           }
         }else {
-          console.log('用户点击了取消按钮')
+          // console.log('用户点击了取消按钮')
         }
       },
       getPhoneNumber () {
@@ -201,7 +222,7 @@
         this.onShareAppMessage(1)
       },
       async createZero () {
-
+        var alreadyCreateZero = false
         const myDate = new Date()
         let today = myDate.getDate()
        for (var i = this.list.length - 1; i >= 0; i--) {
@@ -210,21 +231,26 @@
           if (day == today) {
             if (this.list[i].notes == '今日无消费') {
                wx.showToast({
-                title: '太棒了，我记下了',
+                title: '今日无消费, 太棒了!',
                 icon: 'none',
-                duration: 3000
+                duration: 5000
                })
-               return 
+               alreadyCreateZero = true              
             } 
             if (this.list[i].amount > 0) {
               wx.showToast({
-                title: '您今日已经有消费',
+                title: '您今日已经有消费!',
                 icon: 'none',
                 duration: 3000
                })
+               //alreadyCreateZero = true
                return
             }
          } 
+       }
+       if (alreadyCreateZero == true) {
+        this.onShareAppMessage(1)
+        return
        }
        if (this.submitting == true) {
         return
@@ -235,6 +261,12 @@
        if (Session.get('current_book_id')) {
           bookId = Session.get('current_book_id')
        }
+
+        wx.showToast({
+                title: '今日无消费, 太棒了!',
+                icon: 'none',
+                duration: 3000
+               })
 
         const p = {'record_type': 6, 
                     'amount': 0,
@@ -248,8 +280,10 @@
           return false
         }
         this.getList()
-
         this.submiting = false
+
+
+       this.onShareAppMessage(1)
       }
     }
 
@@ -263,12 +297,17 @@
          bookId = Session.get('current_book_id')
       } 
 
-      for (var i = books.length - 1; i >= 0; i--) {
+      for (var i = books.length - 1; i >= 0; i--) { 
         if (books[i]['id'] == bookId) {
           this.book = books[i]['name']
           this.bookTypeId = books[i]['book_type_id']
 
-          this.currentTotal = books[i]['month_to_date_total']
+          let current = books[i]['month_to_date_total']
+          if (current != undefined) {
+            this.currentTotal = current 
+          }
+          this.$apply() 
+
           return
         }
       }
@@ -277,16 +316,17 @@
     // 预加载用户
    async postUser() {  
     const wxLogin =  wepy.login().then((loginResponse) => {
-      console.log('login code record is ++++++++', loginResponse)
 
         const wxLogin1 =  wepy.login().then((resp) => {
-          console.log('2login code record is ++++++++', resp)
+          //console.log('2login code record is ++++++++', resp)
         })
         wepy.getUserInfo().then((response) => {  
           this.globalData.user = response.userInfo
+          Session.set('userInfo', response.userInfo)
+
           response.userInfo['js_code'] = loginResponse.code
  
-          console.log('getUserInfo ++++++++', response)
+          //console.log('getUserInfo ++++++++', response)
 
           Session.set('login_unauthorized', 'false')
           this.userInfo = true
@@ -332,6 +372,10 @@
     }
 
    async login() {
+      var city = this.globalData.user['city']
+      var province = this.globalData.user['province']
+      var country = this.globalData.user['country']
+      var language = this.globalData.user['language']
       const data = await wxRequest.Post('simple-wechat-login/', {
                 'js_code': this.globalData.user['js_code'],
                  'avatar_url': this.globalData.user['avatarUrl'],
@@ -351,8 +395,8 @@
           this.getChanllengeList()
  
       } else {
-        console.log('else is ++++++++')
-        console.log(data)
+         
+
         Tip.loaded()
       }
   }
@@ -364,16 +408,16 @@
       this.list = res.results  
 
       if (res.book['book_type_id'] === 2) {
-        this.currentTotal = res.book['month_to_date_total']
+        this.currentTotal = res.book['month_to_date_total'].toFixed(1)
         this.headerTitle = '当月支出'
       }
       else {
-        this.currentTotal = res.challenge['current_total']
+        this.currentTotal = res.challenge['current_total'].toFixed(1)
         this.headerTitle = '总支出'
         this.header.position_2_amount = res.challenge['target_amount']
 
         let left = this.header.position_2_amount - this.currentTotal
-        this.header.position_3_amount = left < 0 ? 0 : left
+        this.header.position_3_amount = left < 0 ? 0 : left.toFixed(1)
       }
       // this.currentTotal = res.challenge['current_total']
       Session.set('index_load_cache1', res.results)
@@ -386,16 +430,13 @@
       wx.hideNavigationBarLoading();//隐藏导航条加载动画。
    
       wx.stopPullDownRefresh();//停止当前页面下拉刷新。
-   
-      console.log("关闭");
-   
+      
       wx.setNavigationBarTitle({
         title: '极简星球记账'
       })//动态设置当前页面的标题。
     }
 
     async getMoreList() {
-      console.log('this.hasMoreData = ++++++++', this.hasMoreData)
 
       if (this.hasMoreData == false) {
         return
@@ -404,22 +445,19 @@
       var bookId = 1
       if (Session.get('current_book_id')) {
           bookId = Session.get('current_book_id')
-      }
-      
-      console.log('this.currentPageIndex = ++++++++', this.currentPageIndex)
+      }      
       const data = await wxRequest.Get('books/' + bookId + '/records/', {page: this.currentPageIndex })
-      console.log('data = ++++++++', data)
-      if (typeof data.results === 'undefined') {
+      if (typeof data.results == 'undefined') {
         return
       }
-      if (data.results.next == null ){
+      if (data.next == null ){
+        //console.log('data.results.next == null - moredata:', this.hasMoreData)
         this.hasMoreData = false
       }
 
       for (var i = data.results.length - 1; i >= 0; i--) {
          this.list.push(data.results[i])
       }
-      console.log('this.list =  ++++++++', this.list)
       this.$apply()
     }
 

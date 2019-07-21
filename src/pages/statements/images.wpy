@@ -1,40 +1,27 @@
 <template lang="wxml">
-  <view class="container statement-images">
-    <view wx:if="{{ list.length == 0 }}">
-      <empty :title.sync="emptyTitle"></empty>
+  <view class="container">
+    <view  wx:if="{{ img_l.length == 0 }}">
+      <empty :percent.sync="percent" :color.sync="#000000"  class="progress" ></empty>
     </view>
-
-    <view wx:for="{{ list }}">
-      <view class="year">{{ item.year }}</view>
-      <view class="each-month-images" wx:for="{{ item.data }}" wx:for-item="st">
-        <view class="month">{{ st.month }}月</view>
-
-        <view class="image-item-list">
-          <view class="image-item" wx:for="{{ st.data }}">
-            <image
-              style="width: {{itemWidth}}px;height: {{ itemWidth }}px"
-              @tap="showPicture('{{ item.path }}')"
-              lazy-load="true"
-              src="{{ item.path }}"
-            ></image>
-            <view class="statement-info">
-              <navigator url='/pages/statements/detail?id={{ item.statement_id }}'>
-                查看账单详情
-              </navigator>
-            </view>
-          </view>
-        </view>
-
-      </view>
-
+    <view  class="img">
+      <image src='{{img_l}}' mode='aspectFit'  ></image>
     </view>
   </view>
+ 
+  <view class="column"> 
+        <view >
+          <text @tap="saveImage" class="share" >保存到相册</text>
+        </view>
+    </view>
 </template>
 
 <script>
   import wepy from 'wepy'
   import Empty from '@/components/empty'
-  import wxRequest from '@/utils/wxRequest'
+  import Session from '@/utils/session'
+  import wxRequest from '@/utils/wxRequest';
+  import ProgressCircle from 'wepy-com-progress-circle';
+
   export default class ImagesStatement extends wepy.page {
     config = {
       navigationBarTitleText: '账单图库'
@@ -44,11 +31,13 @@
       itemWidth: 0,
       list: [],
       avatars: [],
-      emptyTitle: '新建账单的关联图片会显示在这里~'
+      emptyTitle: '新建账单的关联图片会显示在这里~',
+      img_l: '',
+      percent: 1,
     }
 
     components = {
-      empty: Empty
+      empty: ProgressCircle,
     }
 
     onLoad () {
@@ -57,7 +46,14 @@
     }
 
     onShow () {
-      this.getStatementImages()
+      //this.getStatementImages()
+      let s = setInterval(() => {
+                this.percent = this.percent + 1;
+                this.$invoke('empty', 'upPercent', this.percent)
+                if (this.percent > 10) {
+                    clearInterval(s);
+                }
+            }, 1000);
     }
 
     methods = {
@@ -66,44 +62,159 @@
           current: item,
           urls: this.avatars
         })
+      },
+      save() {
+        //获取相册授权
+        wx.getSetting({
+          success(res) {
+            if (!res.authSetting['scope.writePhotosAlbum']) {
+              wx.authorize({
+                scope:'scope.writePhotosAlbum',
+                success() {
+                  console.log('授权成功')
+                }
+              })
+            }
+          }
+        })
+      },
+      saveImage() {
+    //     var imgSrc = "http://yijiao.oss-cn-qingdao.aliyuncs.com/images/http://tmp/wx1b4e5e756cd48af1.o6zAJsws4grEQvYrWTjBigy-6QaU.0llhudiKSF2V955a1c48350d9328ef064b4d36d12746.jpg"
+    // wx.downloadFile({
+    //   url: imgSrc,
+    //   success: function (res) {
+    //     console.log(res);
+        var that = this
+        //图片保存到本地
+        wx.saveImageToPhotosAlbum({
+          filePath: that.img_l,
+          success: function (data) {
+            wx.showToast({
+              title: '保存成功',
+              icon: 'success',
+              duration: 2000
+            })
+          },
+          fail: function (err) {
+            console.log(err);
+            if (err.errMsg === "saveImageToPhotosAlbum:fail auth deny") {
+              console.log("当初用户拒绝，再次发起授权")
+              wx.openSetting({
+                success(settingdata) {
+                  console.log(settingdata)
+                  if (settingdata.authSetting['scope.writePhotosAlbum']) {
+                    console.log('获取权限成功，给出再次点击图片保存到相册的提示。')
+                  } else {
+                    console.log('获取权限失败，给出不给权限就无法正常使用的提示')
+                  }
+                }
+              })
+            }
+          },
+          complete(res){
+            console.log(res);
+          }
+        })
+      // }
+    // })
       }
     }
 
     async getStatementImages() {
-      const data = (await wxRequest.Get('statements/images')).data
-      this.list = data.avatar_timeline
-      this.avatars = data.avatars
-      this.$apply()
-    }
+      var bookId = 1
+      if (Session.get('current_book_id') !== null) {
+         bookId = Session.get('current_book_id')
+      }
+      const data = await wxRequest.Get('books/' + bookId + '/poster/')
+      if (data == undefined || data.lengh == 0 || data.url.lengh == 0) {
+          wepy.navigateBack({
+            delta: 1
+          })
+      } else { 
+        var that = this
+        const downloadTask = wx.downloadFile({
+          url: data.url,
+          success: function(res) {
+            console.log('===========',res)
+             if(res.statusCode === 200){
+                that.img_l = res.tempFilePath //将下载的图片临时路径赋值给img_l,用于预览图片
+                that.$apply()
+             }
+          }
+        })
+     
+        downloadTask.onProgressUpdate((res) => {
+          // console.log('下载进度', res.progress)
+          // console.log('已经下载的数据长度', res.totalBytesWritten)
+          // console.log('预期需要下载的数据总长度', res.totalBytesExpectedToWrite)
+          that.percent = res.progress;
+          that.$invoke('empty', 'upPercent', that.percent)
+        })
+      }
+    } 
   }
 </script>
 <style lang="scss">
-  .statement-images {
-    .year {
-      font-size: 40rpx;
-      font-weight: bold;
-      margin: 12px 0;
-    }
-    .month {
-      font-size: 36rpx;
-      margin: 8px 0;
-    }
-    .image-item-list {
-      .image-item {
-        width: 25%;
-        overflow: hidden;
-        text-align:center;
-        margin-bottom:12px;
-        display: inline-block;
-      }
-      .statement-info {
-        font-size: 24rpx;
-        margin-top:-4px;
-        text-align: left;
-        navigator {
-          color: #537c8d;
-        }
-      }
-    }
+page, .container{
+  height: 100%; 
+  background-color: #000000;
+}
+.container {
+  > view {
+    width: 100%;
+    display: block;
   }
+}
+ 
+
+.progress {
+  width: 50%;
+  height: 50%;
+  overflow: auto;
+  margin: auto;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  z-index: 999; 
+
+}
+
+.img{
+   position:absolute;     
+   padding:10 10rpx;
+   background-color: #000000;
+   top: 0rpx;
+   bottom: 145rpx;
+   > image {
+    height: 100%; 
+    width: 100%; 
+  }
+}
+
+.column {
+  position: fixed;
+  bottom: 0rpx;
+  width: 100%;
+  height: 145rpx;
+  font-size: 32rpx;
+  background: black;
+  justify-content: space-between;
+  display: fixed;
+  > text {
+    font-weight: bolder;
+   }
+}
+
+.share {
+    background-color: #f6b44c;
+    color: white;
+    font-weight: bolder;
+    border-radius: 4px;
+    padding: 28rpx 0rpx; 
+    margin: 5rpx 0rpx;
+    right: 30rpx; 
+    left: 30rpx;
+    position: fixed;
+  text-align: center;
+}
+
 </style>

@@ -14,9 +14,9 @@ export default class extends wepy.app {
   config = {
     pages: [
       "pages/index",
-      // "pages/chart",
+      "pages/chart",
       "pages/asset",
-      // "pages/setting",
+      "pages/setting",
 
       // 记一笔
       "pages/statements/create",
@@ -77,7 +77,7 @@ export default class extends wepy.app {
       "navigationBarTitleText": "极简星球",
       // navigationBarTextStyle: "white",
       "enablePullDownRefresh": true
-    },
+    }, 
     // tabBar: {
     //   backgroundColor: "#fff",
     //   color: "#000000",
@@ -90,17 +90,17 @@ export default class extends wepy.app {
     //       text: "首页"
     //     },
     //     {
-    //       pagePath: "pages/chart",
+    //       pagePath: "pages/statements/create",
     //       iconPath: "public/images/settings/statistic.png",
     //       selectedIconPath: "public/images/settings/statistic-active.png",
-    //       text: "统计"
+    //       text: "记账"
     //     },
-    //     {
-    //       pagePath: "pages/asset",
-    //       iconPath: "public/images/settings/asset.png",
-    //       selectedIconPath: "public/images/settings/asset-active.png",
-    //       text: "资产"
-    //     },
+    //     // {
+    //     //   pagePath: "pages/asset",
+    //     //   iconPath: "public/images/settings/asset.png",
+    //     //   selectedIconPath: "public/images/settings/asset-active.png",
+    //     //   text: "资产"
+    //     // },
     //     {
     //       pagePath: "pages/setting",
     //       iconPath: "public/images/settings/user_1.png",

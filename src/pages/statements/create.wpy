@@ -14,6 +14,7 @@
         :submiting.sync="submiting"
         :type="expend"
         @submit.user="submit"
+        id="expend" 
         wx:if="{{ current == 'expend' }}"
       />
 
@@ -113,12 +114,10 @@
     }
 
     onLoad(params) {
-      // // 直接显示转账的界面
-      // if (typeof params.type !== 'undefined' && params.type === 'transfer') {
-      //   this.current = params.type
-      //   this.transferData.source = params.source
-      //   this.transferData.from = params.asset_id
-      // }
+    }
+
+    onShow () {
+      
     }
 
     methods = {
@@ -126,11 +125,13 @@
         this.current = detail.key
       },
       async submit (statement, detail) {
-        this.submiting = true
+        //this.submiting = true
         // const params = {statement: statement, formId: detail.formId}
         // console.log('params======', params)
+        tip.loading('加载中...')
 
-        var bookId = 1
+        this.$broadcast('htmlParser-broadcast')
+        var bookId = 1 
         if (Session.get('current_book_id')) {
             bookId = Session.get('current_book_id')
         }
@@ -138,43 +139,61 @@
                     'amount': statement['amount'],
                     'notes': statement['description']}
         const result = await wxRequest.Post('books/' + bookId + '/records/' , p)
-        if (result === undefined) {
-          this.submiting = false
-          await tip.confirm('由于网络原因，无法同步账单到服务器，现已临时保存在本地，下次网络正常后系统将自动同步到服务端', {}, '保存失败')
-          Session.pushFailStatement(params)
-          wepy.navigateBack({
-            delta: 1
-          })
-          return false
-        }
-        // try {
-          // var success = false
-          // if (result.status === 200 || result.status === 201 ) {
-          //   success = true
-          // }
-
-          //             console.log('============157',success)
-          // if (success) {//result.status === 200 || result.status === 201) {
-            // const store = getStore()
-            // store.dispatch(addStatement(result.data))
-            // for (let file of statement.upload_files) {
-            //   await wxRequest.Upload(file, {
-            //     type: 'statement_upload',
-            //     statement_id: result.data.id
-            //   })
-            // }
-            console.log('============wanna go back')
-            wepy.navigateBack({
-              delta: 1
-            })
-          // } else {
-          //   tip.error(result.msg)
-          // }
-        // } catch (e) {
-        //   console.log('============xxx wanna go back')
-        //   console.log(e)
-        // }
+        
         this.submiting = false
+        tip.loaded()
+
+console.log('----broadcastb---',result)
+
+        if (result == undefined) {
+          // await tip.confirm('由于网络原因，无法同步账单到服务器，现已临时保存在本地，下次网络正常后系统将自动同步到服务端', {}, '保存失败')
+          // Session.pushFailStatement(params)
+          // wx.switchTab({
+          //     url: "../index"
+          //   });
+        } else { 
+
+          //先本地增加一条记录
+          if (Session.get('index_load_cache1')) {
+
+            let amount1 = parseFloat(statement['amount'])
+            var list = Session.get('index_load_cache1')
+            list.unshift({'notes': statement['description'], 'category': statement['record_type'], 'created_at_date': Util.getSimpleCurrentDate(),  'amount': amount1})
+
+            Session.set('index_load_cache1', list)
+
+            // current total 
+            if (Session.get('current_total_load_cache')) {
+              var currentTotal = Session.get('current_total_load_cache')
+              currentTotal =  parseFloat(currentTotal) + amount1
+
+              Session.set('current_total_load_cache', currentTotal)
+            }
+          } 
+            // wx.switchTab({
+            //   url: "../index"
+            // });
+            if (result.show_share_btn == true) {
+              wx.showModal({
+                title: '太棒了！',
+                content: '邀请好友一起达成目标',
+                confirmText: '生成分享',
+                success: function (res) {
+                  if (res.confirm) {
+                     console.log('用户点击确定')
+                    wx.navigateTo({ url: "/pages/statements/images" })
+                  } else if (res.cancel) {
+                    console.log('用户点击取消')
+                    wx.navigateBack({ delta: 1 })
+                  }
+                }
+              })
+            } else {
+             wepy.navigateBack({
+                delta: 1
+              })
+            }
+        }
       }
     }
   }

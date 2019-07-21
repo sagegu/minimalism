@@ -139,10 +139,10 @@ page {
     display: none !important;
   }
   .btn-save {
-    margin:12px;
+    margin: 0rpx 0rpx;
     button {
       color: $primaryText;
-      background-color: $themeColor;
+      background-color: white;
     }
   }
   .frequent-remarks {
@@ -172,3 +172,176 @@ page {
       margin: 0px 10rpx;
   }
 }
+.popup-memu {
+    width: 100%;
+    background-color: white;
+    border-top: 1px solid #dedbd5;
+    border-bottom: 1px solid #eee;
+    display: block;
+}
+ 
+.line {
+    background-color: #eee;
+    margin-left: 10px;
+    height: 1px;
+    margin-right: 10px;
+}
+ 
+.popup-memu {
+    height: 50px;
+    font-size: 15px;
+    line-height: 50px;
+    border-bottom: 1px solid #eee;
+}
+ 
+.payMode {
+    display: flex;
+    background: #fff;
+    align-items: center;
+    border-bottom: 2px solid #eee;
+}
+ 
+.payMode image {
+    width: 30px;
+    height: 30px;
+    margin-left: 18px;
+    margin-right: 10px;
+}
+ 
+.sheet-content {
+    background-color: #fff;
+    padding: 0 15rpx;
+}
+/* 键盘 */
+.password-input {
+    display: flex;
+    width: 660rpx;
+    border: 1px solid #ddd;
+    margin: 0 auto;
+    margin-top: 50rpx;
+    background-color: #fff;
+    border-radius: 3px;
+}
+ 
+.password-input view {
+    width: 110rpx;
+    height: 80rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    border-right: 1px solid #ccc;
+}
+ 
+.password-input view:nth-child(6) {
+    border-right: none;
+}
+ 
+.password-input view text {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #333;
+}
+ 
+.tips {
+    font-size: 28rpx;
+    text-align: center;
+    margin-top: 5px;
+}
+ 
+.tips text {
+    color: #c30;
+}
+ 
+.keyboard {
+    width: 100%;
+    display: flex;
+    background-color: #fff;
+    border-top: 1px solid #eee;
+    position:absolute;
+    bottom: 0rpx;
+}
+ 
+.keyboard .number {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+}
+ 
+.keyboard .number view {
+    width:  190rpx;
+    height: 120rpx;
+    line-height: 120rpx;
+    text-align: center;
+    font-size: 40rpx;
+    box-sizing: border-box;
+    border-right: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+ 
+.keyboard .ctr-btn {
+    width: 180rpx;
+
+    position:absolute;
+    right: 0rpx;
+}
+ 
+.keyboard .ctr-btn view {
+    height: 240rpx;
+    line-height: 240rpx;
+    text-align: center;
+    box-sizing: border-box;
+    border-bottom: 1px solid #eee;
+}
+ 
+.keyboard .ctr-btn view .iconfont {
+    font-size: 40rpx !important;
+    color: #c30;
+}
+ 
+ 
+ 
+.keyboard .active {
+    background-color: #e4e7ed;
+}
+ 
+.activity {
+    background-color: #fff;
+    padding: 25rpx 20rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 24rpx;
+    border-bottom: 1px solid #f6f6f6;
+}
+ 
+.activity.activity-item {
+    font-size: 26rpx;
+}
+ 
+.arrows-right {
+    width: 30rpx;
+    height: 30rpx;
+}
+ 
+.arrows-right.active {
+    transform: rotate(270deg);
+}
+
+.ctr-btn-item {
+    height: 240rpx;
+    line-height: 240rpx;
+    color: black;
+    background-color: white;
+    font-size: 40rpx;
+}
+
+.ctr-btn-item-save {
+    height: 240rpx;
+    line-height: 240rpx;
+    color: #f6b44c;
+    background-color: white;
+    font-size: 40rpx;
+}
+
