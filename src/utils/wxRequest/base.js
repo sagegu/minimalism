@@ -7,6 +7,8 @@ let retryCount = 0
 
 
 const doRequest = async (url, method, params, options = {}, callback) => {
+
+   
   let cacheKey = ''
   // 是否可以命中缓存
   if (options.cacheKey) {
@@ -22,7 +24,7 @@ const doRequest = async (url, method, params, options = {}, callback) => {
       pageRoutes.push(p.route)
     }
   }
-  
+   
 
   var access = ''
   if (Session.get('access') !== null) {
@@ -34,6 +36,10 @@ const doRequest = async (url, method, params, options = {}, callback) => {
       'X-WX-PAGES': pageRoutes.join(','),
       'Authorization':  'Bearer ' + access,
     }
+
+
+     console.log("request", method, url)
+
   return wepy.request({
     url: url,
     method: method,
@@ -46,7 +52,7 @@ const doRequest = async (url, method, params, options = {}, callback) => {
       success = true
     }
    
-    // console.log('response',header, success, url,response) 
+     console.log('response', method, header, success, url, response) 
 
       //no more error toast
 
@@ -61,18 +67,20 @@ const doRequest = async (url, method, params, options = {}, callback) => {
       // Session.pushError({ url: url, method: method, params: params, err: message, statusCode: statusCode, time: new Date().toLocaleString()})
       // let errorInfo = url + ', return: ' + response.data.detail //+ '网络请求超时..'
       // wx.showToast({
-      //   title: errorInfo,
+      //   title: errorsnfo,
       //   icon: 'none',
       //   duration: 3000
       // })
       //statusCode == 400
       let errorReturn = response.data['non_field_errors']
-      if (errorReturn.length > 0) {
+      if (errorReturn != null ) {
+        if (errorReturn.length > 0) {
          wx.showToast({
           title: errorReturn[0],
           icon: 'none',
           duration: 3000
         })
+       }
       } 
     } else {
 
