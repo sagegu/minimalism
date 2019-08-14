@@ -111,8 +111,8 @@
          <view class='right ctr-btn'>
             <view class='ctr-btn-item' hover-class='active' hover-stay-time='100' bindtap='deleteLast'>删除</view>
             <view class='ctr-btn-item-save' hover-class='active' hover-stay-time='100' >
-                   <button class='ctr-btn-item-save' wx:if="{{ !submiting }}" formType="submit">保存</button>
-                    <button wx:else>保存中...</button>
+                   <button class='ctr-btn-item-save'  hover-class='active' hover-stay-time='100'  wx:if="{{ !submiting }}" formType="submit">保存</button>
+                    <button class='ctr-btn-item-saving' wx:else>保存中...</button>
             </view>
         </view>  
     </view> 
@@ -174,7 +174,9 @@ export default class StatementFormComponent extends wepy.component {
 
   events = {
       'htmlParser-broadcast': ($event, ...args) => {
-          // console.log('----broadcastb---')
+         console.log('----收到broadcast---')
+         this.statement.amount = 0
+
          this.submiting = false
          this.$apply()
       },
@@ -328,7 +330,29 @@ export default class StatementFormComponent extends wepy.component {
       statement['category_id'] = this.statement.category_id
       //console.log('s', statement)
       // statement.upload_files = this.statement.upload_files
-      this.$emit('submit', statement, detail)
+        var that = this;
+
+      wx.getNetworkType({
+        success: function(res) {          
+           // 返回网络类型, 有效值：
+          // wifi/2g/3g/4g/unknown(Android下不常见的网络类型)/none(无网络)
+          console.log('返回网络类型, 有效值：', res)
+          if (res.networkType != 'none'){
+            // 当前是否有网络连接
+             
+             that.$emit('submit', statement, detail)
+             
+          }  else {
+             wx.showToast({
+                title: '网络链接失败',
+                icon: 'none',
+                duration: 3000
+              })
+
+          }
+        }
+      })
+
     },
     showPicture (item) {
       wx.previewImage({

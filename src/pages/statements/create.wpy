@@ -117,20 +117,23 @@
     }
 
     onShow () {
-      
+      this.amount
     }
 
     methods = {
       handleChange ({ detail }) {
         this.current = detail.key
       },
+
       async submit (statement, detail) {
-        //this.submiting = true
+        if (this.submiting == true) {
+          return
+        }
+        this.submiting = true
         // const params = {statement: statement, formId: detail.formId}
-        // console.log('params======', params)
+
         tip.loading('加载中...')
 
-        this.$broadcast('htmlParser-broadcast')
         var bookId = 1 
         if (Session.get('current_book_id')) {
             bookId = Session.get('current_book_id')
@@ -140,23 +143,30 @@
                     'notes': statement['description']}
         const result = await wxRequest.Post('books/' + bookId + '/records/' , p)
         
-        this.submiting = false
         tip.loaded()
 
-console.log('----broadcastb---',result)
+
+        console.log('----发出broadcast---')
+        //在广播里设置this.submiting = false,更新UI
+        this.$broadcast('htmlParser-broadcast')
+
+        this.submiting = false
 
         if (result == undefined) {
           // await tip.confirm('由于网络原因，无法同步账单到服务器，现已临时保存在本地，下次网络正常后系统将自动同步到服务端', {}, '保存失败')
-          // Session.pushFailStatement(params)
-          // wx.switchTab({
-          //     url: "../index"
-          //   });
+          wx.showToast({
+            title: '保存失败，请稍后再试',
+            icon: 'none',
+            duration: 3000
+          })
+
         } else { 
+
 
           //先本地增加一条记录
           if (Session.get('index_load_cache1')) {
 
-            let amount1 = parseFloat(statement['amount'])
+            let amount1 = parseFloat(p['amount'])
             var list = Session.get('index_load_cache1')
             list.unshift({'notes': statement['description'], 'category': statement['record_type'], 'created_at_date': Util.getSimpleCurrentDate(),  'amount': amount1})
 
@@ -170,9 +180,7 @@ console.log('----broadcastb---',result)
               Session.set('current_total_load_cache', currentTotal)
             }
           } 
-            // wx.switchTab({
-            //   url: "../index"
-            // });
+
             if (result.show_share_btn == true) {
               wx.showModal({
                 title: '太棒了！',
@@ -184,14 +192,14 @@ console.log('----broadcastb---',result)
                     wx.navigateTo({ url: "/pages/statements/images" })
                   } else if (res.cancel) {
                     console.log('用户点击取消')
-                    wx.navigateBack({ delta: 1 })
+                    //wx.navigateBack({ delta: 1 })
+                    wx.switchTab({url: "../index"});
                   }
                 }
               })
             } else {
-             wepy.navigateBack({
-                delta: 1
-              })
+             //wx.navigateBack({ delta: 1 })
+             wx.switchTab({url: "../index"});
             }
         }
       }
