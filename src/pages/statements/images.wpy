@@ -1,7 +1,7 @@
 <template lang="wxml">
   <view class="container">
     <view  wx:if="{{ img_l.length == 0 }}">
-      <empty :percent.sync="percent" :color.sync="#000000"  class="progress" ></empty>
+      <empty :percent.sync="percent" color="#000000" class="progress" ></empty>
     </view>
     <view  class="img">
       <image src='{{img_l}}' mode='aspectFit'  ></image>
@@ -21,6 +21,7 @@
   import Session from '@/utils/session'
   import wxRequest from '@/utils/wxRequest';
   import ProgressCircle from 'wepy-com-progress-circle';
+  import Tip from '@/utils/tip'
 
   export default class ImagesStatement extends wepy.page {
     config = {
@@ -126,10 +127,16 @@
          bookId = Session.get('current_book_id')
       }
       const data = await wxRequest.Get('books/' + bookId + '/poster/')
-      if (data == undefined || data.lengh == 0 || data.url.lengh == 0) {
-          wepy.navigateBack({
-            delta: 1
-          })
+      if (data == undefined) {
+        // if ( || data.lengh == 0 || data.url.lengh == 0) 
+          // wepy.navigateBack({
+          //   delta: 1
+          // })
+           wx.showToast({
+                title: '此账本暂时没有海报！请联系管理员',
+                icon: 'none',
+                duration: 50000
+               }) 
       } else { 
         var that = this
         const downloadTask = wx.downloadFile({

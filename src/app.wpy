@@ -78,37 +78,37 @@ export default class extends wepy.app {
       // navigationBarTextStyle: "white",
       "enablePullDownRefresh": true
     }, 
-    // tabBar: {
-    //   backgroundColor: "#fff",
-    //   color: "#000000",
-    //   selectedColor: "#2196F3",
-    //   list: [
-    //     {
-    //       pagePath: "pages/index",
-    //       iconPath: "public/images/settings/statement.png",
-    //       selectedIconPath: "public/images/settings/statement-active.png",
-    //       text: "首页"
-    //     },
-    //     {
-    //       pagePath: "pages/statements/create",
-    //       iconPath: "public/images/settings/statistic.png",
-    //       selectedIconPath: "public/images/settings/statistic-active.png",
-    //       text: "记账"
-    //     },
-    //     // {
-    //     //   pagePath: "pages/asset",
-    //     //   iconPath: "public/images/settings/asset.png",
-    //     //   selectedIconPath: "public/images/settings/asset-active.png",
-    //     //   text: "资产"
-    //     // },
-    //     {
-    //       pagePath: "pages/setting",
-    //       iconPath: "public/images/settings/user_1.png",
-    //       selectedIconPath: "public/images/settings/user_1-active.png",
-    //       text: "我的"
-    //     }
-    //   ]
-    // },
+    tabBar: {
+      backgroundColor: "#fff",
+      color: "#000000",
+      selectedColor: "#000000",
+      list: [
+        {
+          pagePath: "pages/index",
+          iconPath: "public/images/statement.png",
+          selectedIconPath: "public/images/statement-active.png",
+          text: "账单"
+        },
+        {
+          pagePath: "pages/statements/create",
+          iconPath: "public/images/add.png",
+          selectedIconPath: "public/images/add.png",
+          text: "记账"
+        },
+        // {
+        //   pagePath: "pages/asset",
+        //   iconPath: "public/images/settings/asset.png",
+        //   selectedIconPath: "public/images/settings/asset-active.png",
+        //   text: "资产"
+        // },
+        {
+          pagePath: "pages/setting",
+          iconPath: "public/images/nimumallogo.png",
+          selectedIconPath: "public/images/nimumallogo.png",
+          text: "极简星球"
+        }
+      ]
+    },
     networkTimeout: {
       request: 100000,
       downloadFile: 100000

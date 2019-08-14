@@ -110,32 +110,50 @@ page, .container{
   background: white;
   justify-content: space-between;
   display: fixed;
-  > text {
-    font-weight: bolder;
-   }
-}
 
-.selected-category {
-    background-color: $themeColor;
-    color: $secondaryText;
-    border-radius: 4px;
-    padding: 12rpx 80rpx;
-    margin: 5rpx 0rpx;
-    font-size: 32rpx;
-    font-weight: bolder;
-    left: 22rpx; 
-    position: fixed;
-}
+  .left {
+      background-color: #f6b44c;
+      color: white;
+      border-radius: 4px;
+      margin: 5rpx 0rpx;
 
-.text-category {
-    background-color: #f6b44c;
-    color: white;
-    font-weight: bolder;
-    border-radius: 4px;
-    padding: 30rpx 122rpx; 
-    margin: 5rpx 0rpx;
-    right: 30rpx; 
-    position: fixed;
+      left: 30rpx; 
+      bottom: 37rpx;
+      position: fixed;
+
+      font-size: 32rpx;
+      font-weight: bolder;
+      padding: 12rpx 50rpx;
+  }
+
+  .middle {
+      background-color: $themeColor;
+      color: $secondaryText;
+      border-radius: 4px;
+      text-align: center;
+
+      font-size: 32rpx;
+      font-weight: bolder;
+      padding: 12rpx 36rpx;
+
+      display: block;
+      width: 20%;    
+      margin: 0 auto;
+  }
+
+  .right {
+      background-color: #f6b44c;
+      color: white;
+      border-radius: 4px;
+
+      right: 30rpx; 
+      bottom: 42rpx;
+      position: fixed;
+
+      font-size: 32rpx;
+      font-weight: bolder;
+      padding: 12rpx 36rpx;
+  }
 }
 
 .auth-float {
@@ -163,11 +181,11 @@ page, .container{
   right: 30rpx;  
   top: 24rpx;
   text-align: center;
-  button {
+  text {
      color: white;
      font-size: 26rpx;
      border-radius: 12px;
-     padding: 0rpx 24rpx;
+     padding: 12rpx 24rpx;
       background-color: #f6b44c;
       color: white;
       font-weight: bolder;

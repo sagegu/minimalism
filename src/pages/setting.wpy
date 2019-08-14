@@ -54,7 +54,7 @@
       </view>
     </view> -->
 
-    <view class="setting-container">
+<!--     <view class="setting-container">
       <view>
         <button class="get-user-btn" open-type="getUserInfo" bindgetuserinfo="getUserInfo">生成报告</button>
                 
@@ -66,22 +66,28 @@
 
         <view class="column">
       <button class="share" open-type="share">推荐给朋友使用</button>
-    </view>
+    </view> -->
 
-
-     <!--  <i-cell-group>
+      <i-cell-group>
         <i-cell 
           title="账单图库"
           is-link url="/pages/statements/images">
         </i-cell>
 
+
+
         <i-cell 
-          title="消息通知"
+          title="切换语言"
+          is-link url="/pages/message">
+        </i-cell>
+
+        <i-cell 
+          title="推荐给朋友使用"
           is-link url="/pages/message">
         </i-cell>
  
  
-      </i-cell-group> -->
+      </i-cell-group>
     </view>
 
   

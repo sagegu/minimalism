@@ -7,14 +7,14 @@
 
         <!-- 打卡 -->
         <view  class="pull-right share-everyday" >
-            <button open-type="share" @tap="share" >分享打卡</button>
+          <text @tap="gotoPost"  >签到</text>
         </view>
 
       <view class="level-2">
         <view class="fs32 today-expend">{{ currentTotal }}</view>
         <view class="fs13 amount-expend"> <text>{{ headerTitle }}</text> </view>
         <view class="overflow-hide" wx:if="{{ bookTypeId==1 }}">  
-          <view class="pull-left fs13">{{ header.position_2_human_name }} {{ header.position_2_amount }} {{ header.position_3_human_name }} {{ header.position_3_amount }} 
+          <view class="pull-left fs13">{{ position_2_human_name }} {{ header.position_2_amount }} {{ header.position_3_human_name }} {{ header.position_3_amount }} 
           </view>
         </view> 
       </view>      
@@ -44,19 +44,18 @@
   </view>
 
 <!-- 记账 -->
-     <view class="column"> 
+    <!--  <view class="column"> 
         <view >
-          <text @tap="gotoCreate" class="text-category" >生成海报</text>
+          <button open-type="share" @tap="share" class="left">分享打卡</button>
         </view>
+        <view > 
+          <button @tap="gotoCreate" class="middle" >记账</button>
+        </view>
+          <button open-type="share" @tap="createZero" class="right">无消费打卡</button>
         <view >
-          <button open-type="share" @tap="createZero" class="selected-category">无消费打卡</button>
-          <!-- <text wx:if="{{ !submiting }}" @tap="createZero" class="selected-category" >无消费打卡</text>
-           <text wx:else class="selected-category">无消费打卡...</text> -->
+         
         </view>
-        <view >
-          <text @tap="gotoCreate" class="text-category" >记账</text>
-        </view>
-    </view>
+    </view> -->
 
   <!-- 请求授权 -->
       <view wx:if="{{ !userInfo }}">  
@@ -91,6 +90,10 @@
   import { asyncList } from '@/store/actions'
   import Tip from '@/utils/tip'
   import Util from '@/utils/util.js'
+  //国际化
+import locales from '@/utils/locales'
+import T from '@/utils/wxapp-i18n'
+
   export default class Index extends wepy.page {
     config = {
       navigationBarTitleText: '极简星球记账',
@@ -108,8 +111,8 @@
       // list: [ {id: '1', description: '今天很能花', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'},
       //        {id: '1', description: '雪顶咖啡', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'}  ],
       list: [],
-      header: { position_2_human_name: "挑战金额：", position_2_amount: 1000, position_3_human_name:"；  结余：", position_3_amount: " " },
-
+      position_2_human_name: "",
+      header: { position_2_amount: "", position_3_human_name:"；  结余：", position_3_amount: " " },
       headerTitle:  "当月支出",
 
       userInfo: true,
@@ -150,7 +153,7 @@
         this.currentTotal = total.toFixed(1)
 
         let left = this.header.position_2_amount - this.currentTotal
-        this.header.position_3_amount = left < 0 ? 0 : left.toFixed(1)
+        this.header.position_3_amount = left < 0 ? "" : left.toFixed(1)
 
       }
 
@@ -164,6 +167,28 @@
          this.token()
       } 
       this.isFirstOnShow = false
+
+            // 数据注入
+      T.registerLocale(locales)
+      try {
+        // 获取系统设置的语言格式
+        var value = wx.getStorageSync('language')
+        if (value) {
+          T.setLocale(value)
+        } else {
+          T.setLocale('zh-hk')//默认显示繁体
+        }
+      } catch (e) {
+        T.setLocale('zh-hk')//默认显示繁体
+      }
+      wx.T = T
+
+      console.log('-------', T)
+      const _ = wx.T._ 
+
+      this.position_2_human_name = _('Buget')
+         
+      console.log('------time-', _('Time'))
     }
 
     onPullDownRefresh() {
@@ -197,6 +222,10 @@
     methods = {
       gotoCreate () {
         wx.navigateTo({ url: "/pages/statements/create" })
+      },
+      gotoPost(){
+        wx.navigateTo({ url: "/pages/statements/images" })
+
       },
       gotoChallenge () {
         //wx.navigateTo({ url: "/pages/asset" })
