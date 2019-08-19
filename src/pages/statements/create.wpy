@@ -191,14 +191,14 @@
                     wx.navigateTo({ url: "/pages/statements/images" })
                   } else if (res.cancel) {
                     console.log('用户点击取消')
-                    //wx.navigateBack({ delta: 1 })
-                    wx.switchTab({url: "../index"});
+                    wx.navigateBack({ delta: 1 })
+                    //wx.switchTab({url: "../index"});
                   }
                 }
               })
             } else {
-             //wx.navigateBack({ delta: 1 })
-             wx.switchTab({url: "../index"});
+             wx.navigateBack({ delta: 1 })
+             //wx.switchTab({url: "../index"});
             }
         }
       }

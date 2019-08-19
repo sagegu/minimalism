@@ -7,7 +7,7 @@
 
         <!-- 打卡 -->
         <view  class="pull-right share-everyday" >
-          <text @tap="gotoPost"  >签到</text>
+          <text @tap="gotoPost"  >生成海报</text>  <!-- 签到 -->
         </view>
 
       <view class="level-2">
@@ -44,7 +44,7 @@
   </view>
 
 <!-- 记账 -->
-    <!--  <view class="column"> 
+    <!---->  <view class="column"> 
         <view >
           <button open-type="share" @tap="share" class="left">分享打卡</button>
         </view>
@@ -55,7 +55,7 @@
         <view >
          
         </view>
-    </view> -->
+    </view> 
 
   <!-- 请求授权 -->
       <view wx:if="{{ !userInfo }}">  
@@ -434,22 +434,25 @@ import T from '@/utils/wxapp-i18n'
       const store = getStore() 
       const result = await store.dispatch(asyncList())
       const res = store.getState().statement.statements   
-      this.list = res.results  
+      if (res != undefined) {
+        this.list = res.results  
 
-      if (res.book['book_type_id'] === 2) {
-        this.currentTotal = res.book['month_to_date_total'].toFixed(1)
-        this.headerTitle = '当月支出'
-      }
-      else {
-        this.currentTotal = res.challenge['current_total'].toFixed(1)
-        this.headerTitle = '总支出'
-        this.header.position_2_amount = res.challenge['target_amount']
+        if (res.book['book_type_id'] === 2) {
+          this.currentTotal = res.book['month_to_date_total'].toFixed(1)
+          this.headerTitle = '当月支出'
+        }
+        else {
+          this.currentTotal = res.challenge['current_total'].toFixed(1)
+          this.headerTitle = '总支出'
+          this.header.position_2_amount = res.challenge['target_amount']
 
-        let left = this.header.position_2_amount - this.currentTotal
-        this.header.position_3_amount = left < 0 ? 0 : left.toFixed(1)
+          let left = this.header.position_2_amount - this.currentTotal
+          this.header.position_3_amount = left < 0 ? 0 : left.toFixed(1)
+        }
+        // this.currentTotal = res.challenge['current_total']
+        Session.set('index_load_cache1', res.results)
       }
-      // this.currentTotal = res.challenge['current_total']
-      Session.set('index_load_cache1', res.results)
+      
 
       Session.set('current_total_load_cache', this.currentTotal)
       this.$apply()
