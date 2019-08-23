@@ -135,3 +135,30 @@
     height:34rpx;
   }
 }
+
+
+.pay {
+  position: fixed;
+  bottom: 0rpx;
+  width: 100%;
+  height: 145rpx;
+  font-size: 32rpx;
+  background: white;
+  justify-content: space-between;
+  display: fixed;
+
+  .left {
+      background-color: #f6b44c;
+      color: white;
+      border-radius: 4px;
+      margin: 5rpx 0rpx;
+
+      left: 30rpx; 
+      right: 30rpx;
+      position: fixed;
+
+      font-size: 32rpx;
+      font-weight: bolder;
+      padding: 12rpx 50rpx;
+  }
+}

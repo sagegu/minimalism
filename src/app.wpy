@@ -54,9 +54,10 @@ export default class extends wepy.app {
       "pages/categories/child",
       "pages/categories/category_form",
       "pages/categories/category_statement",
-      "pages/assets/list",
-      "pages/assets/asset_form",
-      "pages/assets/asset_detail",
+
+      "pages/book/create_book",
+      "pages/book/form",
+
       
       // 消息
       // "pages/message",
@@ -92,7 +93,7 @@ export default class extends wepy.app {
     //     {
     //       pagePath: "pages/statements/create",
     //       iconPath: "public/images/add.png",
-    //       selectedIconPath: "public/images/add.png",
+    //       selectedIconPath: "public/images/add-active.png",
     //       text: "记账"
     //     },
     //     // {
@@ -104,7 +105,7 @@ export default class extends wepy.app {
     //     {
     //       pagePath: "pages/setting",
     //       iconPath: "public/images/nimumallogo.png",
-    //       selectedIconPath: "public/images/nimumallogo.png",
+    //       selectedIconPath: "public/images/nimumallogo-active.png",
     //       text: "极简星球"
     //     }
     //   ]

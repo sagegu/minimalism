@@ -1,4 +1,4 @@
-<template>
+<template  lang="wxml">
   <view class="container">
     <view class="header"  >
     
@@ -100,7 +100,7 @@
   import tip from '@/utils/tip'
   import Session from '@/utils/session'
 
-  export default class Setting extends wepy.page {
+  export default class Setting extends wepy.component {
     config = {
       navigationBarTitleText: '我的',
       "usingComponents": {

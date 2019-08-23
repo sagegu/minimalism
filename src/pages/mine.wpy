@@ -1,0 +1,97 @@
+<template lang="wxml">
+  <view class="container">
+    <view class="header">
+       <view class="main-container">
+          <view class="user-section" @tap="redirect('/pages/settings/user_info')">
+            <view class="user">
+              <view>
+                <image src="{{ user.avatarUrl }}"></image>
+              </view>
+              <view class="user-info">
+                <view style="font-size: 16px">{{ user.name }}</view>
+                <view class="text-grey">{{ sayHello }}</view>
+              </view>
+            </view>
+          </view>  
+
+
+          <view class="body">
+            <view class="cell" @tap="gotoAboutus">
+              <!-- <text>关于我们</text> -->
+              <button class="cell-share" open-type="contact">进入客服会话</button>
+            </view>
+          
+            <view class="cell">
+              <button class="cell-share" open-type="share">推荐给朋友使用</button>
+            </view>
+          </view>
+         
+       </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import tip from '@/utils/tip'
+  import Session from '@/utils/session'
+
+  export default class Mine extends wepy.component {
+    props = {
+      title: {
+        type: String,
+        default: ''
+      }
+    };
+    data = {
+      user: {
+        name: '访客',
+        bonus_points: 0,
+        avatarUrl: '../public/images/no_login_avatar.png',
+        already_login: true
+      },
+      version: ''
+    }
+
+    computed = {
+      sayHello () {
+        const now = new Date()
+        const hour = now.getHours()
+        if(hour < 6){
+          return '凌晨好'
+        } else if (hour < 9) {
+          return '早上好'
+        } else if (hour < 12) {
+          return '上午好'
+        } else if (hour < 14) {
+          return '中午好'
+        } else if (hour < 17) {
+          return '下午好'
+        } else if (hour < 24) {
+          return '晚上好'
+        } else {
+          return '你好'
+        }
+      }
+    }
+
+     onLoad () {
+        wx.showShareMenu({
+          withShareTicket: true
+        }); 
+        this.user = Session.get('userInfo')
+        this.$apply()
+        console.log('-----yhghhy',this.user)
+     }
+
+    methods = {
+      gotoAboutus () {
+        //wx.navigateTo({ url: "/pages/statements/create" })
+      },
+    }
+     
+  }
+</script>
+
+<style lang="scss" src="../public/styles/setting.scss"></style>

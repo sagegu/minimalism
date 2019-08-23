@@ -1,50 +1,65 @@
 <template>
-  <view class="container">
-    <view class="header">
-       <view class="level-1"  @tap="gotoBooks">
-          <text>{{ book }}  🔻 </text>
-        </view>
+  <view class="container" wx:if="{{ current == 'mine' }}">
+    <mine :title.sync="emptyTitle"></mine>
+  </view>  
 
-        <!-- 打卡 -->
-        <view  class="pull-right share-everyday" >
-          <text @tap="gotoPost"  >生成海报</text>  <!-- 签到 -->
-        </view>
+  <view class="container" >
+    <view class="homepage" wx:if="{{ current == 'homepage' || current == 'add' }}" >
+      <view class="header" >
+         <view class="level-1"  @tap="gotoBooks"> <text>{{ book }}  🔻 </text> </view>
+          <!-- 打卡 -->
+          <view  class="pull-right share-everyday" > <!-- <text @tap="gotoPost"  >生成海报</text> -->  <!-- 签到 --> <button open-type="share" @tap="share" class="left">分享打卡</button> </view>
+         
+         <view class="level-2">
+            <view class="fs32 today-expend">{{ currentTotal }}</view>
+            <view class="fs13 amount-expend"> <text>{{ headerTitle }}</text> </view>
+            <view class="overflow-hide" wx:if="{{ bookTypeId==1 }}">  
+              <view class="pull-left fs13">{{ position_2_human_name }} {{ header.position_2_amount }} {{ header.position_3_human_name }} {{ header.position_3_amount }}  </view>
+            </view> 
+         </view>      
+         <!-- notice bar -->
+          <i-notice-bar icon="systemprompt" wx:if="{{ header.show_notice_bar }}">
+            <navigator wx:if="{{ header.notice_bar_path }}" url="{{ header.notice_bar_path }}">
+              <text>{{ header.notice_text }}</text>
+            </navigator>
+            <text wx:else>{{ header.notice_text }}</text>
+          </i-notice-bar>
+      </view>
+      <!-- header end -->
+      <!--content 🔻 -->
+      <view class="statement-list" wx-if="{{ list.length > 0 }}">
+        <repeat for="{{ list }}" key="index" index="index" item="item">
+          <StatementItem :statement.sync="item"></StatementItem>
+        </repeat>
+      </view>
 
-      <view class="level-2">
-        <view class="fs32 today-expend">{{ currentTotal }}</view>
-        <view class="fs13 amount-expend"> <text>{{ headerTitle }}</text> </view>
-        <view class="overflow-hide" wx:if="{{ bookTypeId==1 }}">  
-          <view class="pull-left fs13">{{ position_2_human_name }} {{ header.position_2_amount }} {{ header.position_3_human_name }} {{ header.position_3_amount }} 
-          </view>
-        </view> 
-      </view>      
+      <view wx:if="{{ list.length == 0 }}">
+       <empty :title.sync="emptyTitle"></empty>
+      </view>
+   </view>
 
-      <i-notice-bar icon="systemprompt" wx:if="{{ header.show_notice_bar }}">
-        <navigator wx:if="{{ header.notice_bar_path }}" url="{{ header.notice_bar_path }}">
-          <text>{{ header.notice_text }}</text>
-        </navigator>
-        <text wx:else>{{ header.notice_text }}</text>
-      </i-notice-bar>
+      <!-- homepage end -->
+      <!--tab bar 🔻 -->
+    <view class="share-float">
+     <i-tab-bar current="{{ current }}" color="#f6b44c" bindchange="handleChange" @tap="gotoCreate">
+        <i-tab-bar-item wx:if="{{current=='mine'}}" key="homepage" icon="homepage" current-icon="homepage_fill" title="账本">
+        </i-tab-bar-item>
+        <i-tab-bar-item wx:else  key="add" icon="add" current-icon="add" title="记账">
+        </i-tab-bar-item>
+        <!-- <i-tab-bar-item key="homepage" icon="homepage" current-icon="homepage_fill" title="账本"></i-tab-bar-item> 
+        <i-tab-bar-item key="group" icon="group" current-icon="group_fill" title="朋友"></i-tab-bar-item>
+        <i-tab-bar-item key="add" icon="add" current-icon="add" title="记账"></i-tab-bar-item>
+         -->
+       <i-tab-bar-item key="mine" icon="mine" current-icon="mine_fill" title="我的"></i-tab-bar-item>
+
+      </i-tab-bar>
     </view>
+      
     
-<!--      <view class="zan-btns new-record">
-      <navigator url="/pages/statements/create">
-        <button class="zan-btn jz-btn btn-shadow">记一笔</button>
-      </navigator>
-    </view> -->
-    <view class="statement-list" wx-if="{{ list.length > 0 }}">
-      <repeat for="{{ list }}" key="index" index="index" item="item">
-        <StatementItem :statement.sync="item"></StatementItem>
-      </repeat>
-    </view>
-
-    <view wx:if="{{ list.length == 0 }}">
-      <empty :title.sync="emptyTitle"></empty>
-    </view>
   </view>
 
 <!-- 记账 -->
-    <!---->  <view class="column"> 
+    <!--  <view class="column"> 
         <view >
           <button open-type="share" @tap="share" class="left">分享打卡</button>
         </view>
@@ -56,7 +71,7 @@
          
         </view>
     </view> 
-
+-->
   <!-- 请求授权 -->
       <view wx:if="{{ !userInfo }}">  
        <view class="auth-float">      
@@ -67,7 +82,7 @@
       </view>
     </view>
 
-  <!-- 分享 -->
+  <!-- 分享 -- >
     <!--   <view>  
        <view class="share-float">      
         <image src="../public/images/forwardbg.png"></image>
@@ -77,6 +92,8 @@
         </view>
        </view>
     </view> -->
+ 
+ 
 
 </template>
 
@@ -86,19 +103,22 @@
   import Session from '@/utils/session'
   import Empty from '@/components/empty'
   import StatementItem from '@/components/index/statement'
+  import Mine from '@/pages/mine'
   import { getStore } from 'wepy-redux'
   import { asyncList } from '@/store/actions'
   import Tip from '@/utils/tip'
   import Util from '@/utils/util.js'
   //国际化
-import locales from '@/utils/locales'
-import T from '@/utils/wxapp-i18n'
+  import locales from '@/utils/locales'
+  import T from '@/utils/wxapp-i18n'
 
   export default class Index extends wepy.page {
     config = {
       navigationBarTitleText: '极简星球记账',
       "usingComponents": {
-        "i-notice-bar": "../public/iview/notice-bar/index"
+         "i-notice-bar": "../public/iview/notice-bar/index",
+         "i-tab-bar": "../public/iview/tab-bar/index",
+         "i-tab-bar-item": "../public/iview/tab-bar-item/index",
       }
     }
 
@@ -121,12 +141,15 @@ import T from '@/utils/wxapp-i18n'
       currentPageIndex: 1,
       hasMoreData: true,
       isFirstOnShow: true,
+
+      current: 'homepage',
     }
 
     components = {
       empty: Empty,
       orderEmpty: Empty,
-      StatementItem
+      StatementItem,
+      mine: Mine,
 		}
   
     globalData = {
@@ -191,6 +214,11 @@ import T from '@/utils/wxapp-i18n'
       console.log('------time-', _('Time'))
     }
 
+    handleChange ({ detail }) {
+        this.current=detail.key
+        this.$apply()
+    }
+
     onPullDownRefresh() {
       this.hasMoreData = true
       this.currentPageIndex  = 1
@@ -221,11 +249,14 @@ import T from '@/utils/wxapp-i18n'
 
     methods = {
       gotoCreate () {
-        wx.navigateTo({ url: "/pages/statements/create" })
+         if (this.current == 'add'){
+            wx.navigateTo({ url: "/pages/statements/create" })
+            this.current == 'homepage'
+            this.$apply()
+         }
       },
       gotoPost(){
         wx.navigateTo({ url: "/pages/statements/images" })
-
       },
       gotoChallenge () {
         //wx.navigateTo({ url: "/pages/asset" })
@@ -236,13 +267,7 @@ import T from '@/utils/wxapp-i18n'
       getUserInfo (res) {
         this.userInfo = true
         if(res.detail.userInfo) {
-          // console.log('用户点击了授权按钮')
-
-          if (this.userInfo) {
-             this.postUser() 
-          }
-        }else {
-          // console.log('用户点击了取消按钮')
+          if (this.userInfo) {this.postUser()}
         }
       },
       getPhoneNumber () {
@@ -310,9 +335,7 @@ import T from '@/utils/wxapp-i18n'
         }
         this.getList()
         this.submiting = false
-
-
-       this.onShareAppMessage(1)
+        this.onShareAppMessage(1)
       }
     }
 
@@ -336,11 +359,11 @@ import T from '@/utils/wxapp-i18n'
             this.currentTotal = current 
           }
           this.$apply() 
-
           return
         }
       }
     }
+
 
     // 预加载用户
    async postUser() {  
@@ -492,7 +515,7 @@ import T from '@/utils/wxapp-i18n'
       }
       this.$apply()
     }
-
+ 
     async getChanllengeList() {  
       const data = await wxRequest.Get('users/self/books/' )
       if (data == undefined) {

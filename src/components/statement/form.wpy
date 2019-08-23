@@ -330,8 +330,8 @@ export default class StatementFormComponent extends wepy.component {
       statement['category_id'] = this.statement.category_id
       //console.log('s', statement)
       // statement.upload_files = this.statement.upload_files
-        var that = this;
-
+      
+      var that = this;
       wx.getNetworkType({
         success: function(res) {          
            // 返回网络类型, 有效值：

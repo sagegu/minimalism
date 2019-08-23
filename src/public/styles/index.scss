@@ -3,6 +3,9 @@ page, .container{
   height: 100%;
 }
 .container {
+  .homepage {
+    background: white;
+  }
   > view {
     width: 100%;
     display: block;
@@ -157,6 +160,7 @@ page, .container{
 }
 
 .auth-float {
+  background: white;
   position: fixed;
   right:0rpx;
   bottom:0rpx;
@@ -181,11 +185,11 @@ page, .container{
   right: 30rpx;  
   top: 24rpx;
   text-align: center;
-  text {
+  button {
      color: white;
      font-size: 26rpx;
      border-radius: 12px;
-     padding: 12rpx 24rpx;
+     padding: 5rpx 24rpx;
       background-color: #f6b44c;
       color: white;
       font-weight: bolder;
@@ -198,23 +202,31 @@ page, .container{
   right:0rpx;
   bottom:0rpx;
   left:0rpx;
-  top:0rpx;
-  text-align: center;
-  background: #ffffff;
-  image { 
-   position: fixed;
-   bottom: 10rpx;
-   left: 10rpx;
-   right: 10rpx;
+  line-height: 60rpx;
+}
+
+
+.body {
+   .cell {
+    height: 120rpx;
+    line-height: 120rpx;
+    padding:0 44rpx;
+    border-bottom: 1px solid #efefef;
+    font-size: 28rpx;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    > text {
+      min-width:100rpx;
+    }
   }
-  button {
-   width:300rpx;
-  height: 50rpx;
-   background: #4fae71;
-   color: white;
-  position: fixed;
-   bottom: 10rpx;
-   left:10rpx;
-   right:10rpx;
+  .cell-share {
+    background-color: white;
+    color: $secondaryText;
+    font-size:  28rpx;
+    font-weight: bolder;
+    margin: 5rpx 0rpx;
+    padding: 22rpx 36rpx;
   }
+
 }

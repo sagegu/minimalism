@@ -34,6 +34,10 @@
     </view>
   </view>
 
+  <view class="pay"> 
+    <!--   <button  @tap="create" class="left">创建账本</button> -->
+  </view>
+
 </view>
 </template>
 
@@ -69,6 +73,9 @@
       async eyesTab () {
         this.$parent.globalData.user.hidden_asset_money = !this.$parent.globalData.user.hidden_asset_money
         await wxRequest.Put('users/update_user', { user: { hidden_asset_money: this.$parent.globalData.user.hidden_asset_money ? 1 : 0 } })
+      },
+      create () {
+        wx.navigateTo({ url: "/pages/book/create_book" })
       }
     }
 
@@ -130,9 +137,7 @@
       wx.hideNavigationBarLoading();//隐藏导航条加载动画。
    
       wx.stopPullDownRefresh();//停止当前页面下拉刷新。
-   
-      console.log("关闭");
-   
+      
       wx.setNavigationBarTitle({
         title: '我的账本'
       })//动态设置当前页面的标题。

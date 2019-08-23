@@ -75,6 +75,7 @@
       expend: 'expend',
       income: 'income',
       submiting: false,
+      addRecord: 0,
       transferData: {
         id: 0,
         type: 'transfer',
@@ -102,7 +103,7 @@
         date: Util.getCurrentDate(),
         time: Util.getCurrentTime(),
         upload_files: []
-      }
+      },
     }
 
     components = {
@@ -117,6 +118,19 @@
     }
 
     onShow () {
+    }
+
+    onShareAppMessage (e) {
+      if (e.from == 'menu') {
+        return {
+          title: '极简星球记账，专为极简主义者准备的记账本',
+          path: '/pages/index',
+          imageUrl: '../public/images/foward.jpeg',
+          success(e) { },
+          fail(e) { },
+          complete() { }
+        }
+      }
     }
 
     methods = {
@@ -180,26 +194,32 @@
             }
           } 
 
-            if (result.show_share_btn == true) {
-              wx.showModal({
+          this.addRecord =  this.addRecord + 1
+
+          //邀请好友
+          if (this.addRecord % 2 == 0) {
+             var that = this;
+             wx.showModal({
                 title: '太棒了！',
-                content: '邀请好友一起达成目标',
+                content: '又是理智消费的一天，分享给小伙伴们一起进步吧！',//'邀请好友一起达成目标',
                 confirmText: '生成分享',
+                confirmColor: '#f6b44c',
+                cancelColor: '#757575',
                 success: function (res) {
                   if (res.confirm) {
-                     console.log('用户点击确定')
-                    wx.navigateTo({ url: "/pages/statements/images" })
+                    that.onShareAppMessage('menu')
+
+                    // wx.navigateTo({ url: "/pages/statements/images" })
                   } else if (res.cancel) {
-                    console.log('用户点击取消')
                     wx.navigateBack({ delta: 1 })
                     //wx.switchTab({url: "../index"});
                   }
                 }
               })
-            } else {
-             wx.navigateBack({ delta: 1 })
-             //wx.switchTab({url: "../index"});
-            }
+          } else {
+           wx.navigateBack({ delta: 1 })
+           //wx.switchTab({url: "../index"});
+          }
         }
       }
     }
