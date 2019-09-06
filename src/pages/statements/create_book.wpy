@@ -159,7 +159,7 @@
         tip.loaded()
 
 
-        console.log('----发出broadcast---', result)
+        console.log('----发出broadcast---')
         //在广播里设置this.submiting = false,更新UI
         this.$broadcast('htmlParser-broadcast')
 
@@ -168,7 +168,7 @@
         if (result == undefined) {
           // await tip.confirm('由于网络原因，无法同步账单到服务器，现已临时保存在本地，下次网络正常后系统将自动同步到服务端', {}, '保存失败')
           wx.showToast({
-            title: '保存失败，请查看挑战账簿是不是已经过期',
+            title: '保存失败，请稍后再试',
             icon: 'none',
             duration: 3000
           })

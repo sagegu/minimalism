@@ -80,7 +80,7 @@
         })
       },
       saveImage() {
-    //     var imgSrc = "http://yijiao.oss-cn-qingdao.aliyuncs.com/images/http://tmp/wx1b4e5e756cd48af1.o6zAJsws4grEQvYrWTjBigy-6QaU.0llhudiKSF2V955a1c48350d9328ef064b4d36d12746.jpg"
+
     // wx.downloadFile({
     //   url: imgSrc,
     //   success: function (res) {
@@ -127,7 +127,8 @@
          bookId = Session.get('current_book_id')
       }
       const data = await wxRequest.Get('books/' + bookId + '/poster/')
-      if (data == undefined) {
+             console.log('===========',data)
+     if (data == undefined) {
         // if ( || data.lengh == 0 || data.url.lengh == 0) 
           // wepy.navigateBack({
           //   delta: 1

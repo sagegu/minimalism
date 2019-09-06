@@ -1,14 +1,22 @@
 <template>
   <view class="container" wx:if="{{ current == 'mine' }}">
-    <mine :title.sync="emptyTitle"></mine>
+    <mine 
+    :title.sync="nickName"
+    :avatarUrl.sync="avatarUrl"
+    @submit.user="submit"
+    ></mine>
   </view>  
 
+
   <view class="container" >
+
     <view class="homepage" wx:if="{{ current == 'homepage' || current == 'add' }}" >
-      <view class="header" >
-         <view class="level-1"  @tap="gotoBooks"> <text>{{ book }}  🔻 </text> </view>
+      <view class="header" wx:if="{{ book }}">
+         <view class="level-1"  @tap="gotoBooks"> <text>{{ book }} </text> </view>
           <!-- 打卡 -->
-          <view  class="pull-right share-everyday" > <!-- <text @tap="gotoPost"  >生成海报</text> -->  <!-- 签到 --> <button open-type="share" @tap="share" class="left">分享打卡</button> </view>
+          <view  class="pull-right share-everyday" >
+             <button open-type="share" @tap="share" class="left">分享打卡</button> 
+          </view>
          
          <view class="level-2">
             <view class="fs32 today-expend">{{ currentTotal }}</view>
@@ -17,13 +25,7 @@
               <view class="pull-left fs13">{{ position_2_human_name }} {{ header.position_2_amount }} {{ header.position_3_human_name }} {{ header.position_3_amount }}  </view>
             </view> 
          </view>      
-         <!-- notice bar -->
-          <i-notice-bar icon="systemprompt" wx:if="{{ header.show_notice_bar }}">
-            <navigator wx:if="{{ header.notice_bar_path }}" url="{{ header.notice_bar_path }}">
-              <text>{{ header.notice_text }}</text>
-            </navigator>
-            <text wx:else>{{ header.notice_text }}</text>
-          </i-notice-bar>
+         
       </view>
       <!-- header end -->
       <!--content 🔻 -->
@@ -36,7 +38,7 @@
       <view wx:if="{{ list.length == 0 }}">
        <empty :title.sync="emptyTitle"></empty>
       </view>
-   </view>
+    </view>
 
       <!-- homepage end -->
       <!--tab bar 🔻 -->
@@ -56,507 +58,552 @@
     </view>
       
     
-  </view>
-
-<!-- 记账 -->
-    <!--  <view class="column"> 
-        <view >
-          <button open-type="share" @tap="share" class="left">分享打卡</button>
-        </view>
-        <view > 
-          <button @tap="gotoCreate" class="middle" >记账</button>
-        </view>
-          <button open-type="share" @tap="createZero" class="right">无消费打卡</button>
-        <view >
-         
-        </view>
-    </view> 
--->
-  <!-- 请求授权 -->
-      <view wx:if="{{ !userInfo }}">  
-       <view class="auth-float">      
-        <image src="../public/images/nimumallogo.png"></image>
-  <!--       <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">Get Phone</button>
-   -->
-        <button open-type="getUserInfo" bindgetuserinfo="getUserInfo">开启极简星球账本</button>
+     <!-- 请求授权 -->
+     <view wx:if="{{ showAuthorise }}"  class="authorise" @tap="hideAuthorise">     
+        <view class="authorise-bottom">
+          <image src="http://pwu25dhu2.bkt.clouddn.com/logo512.png"></image>
+          <button open-type="getUserInfo" bindgetuserinfo="getUserInfo">开启极简星球账本</button> 
+          <button  @tap="hideAuthorise" class="cancel">暂不授权</button> 
+          <text  class="message">通过授权后可使用极简星球提供的记账和挑战功能</text>
+          <text  class="message"  @tap="copy">如有疑问，请联系客服微信Lizlatte  点击复制</text>
       </view>
-    </view>
+     </view>
 
-  <!-- 分享 -- >
-    <!--   <view>  
-       <view class="share-float">      
-        <image src="../public/images/forwardbg.png"></image>
-        <view >
-          <text @tap="gotoCreate" class="text-category" >太棒了</text>
-          <text @tap="gotoCreate" class="text-category" >邀请好友一起达成目标</text>
-        </view>
-       </view>
-    </view> -->
- 
- 
+  </view> 
 
 </template>
 
 <script>
-  import wepy from 'wepy'
-  import wxRequest from '@/utils/wxRequest'
-  import Session from '@/utils/session'
-  import Empty from '@/components/empty'
-  import StatementItem from '@/components/index/statement'
-  import Mine from '@/pages/mine'
-  import { getStore } from 'wepy-redux'
-  import { asyncList } from '@/store/actions'
-  import Tip from '@/utils/tip'
-  import Util from '@/utils/util.js'
-  //国际化
-  import locales from '@/utils/locales'
-  import T from '@/utils/wxapp-i18n'
+import wepy from 'wepy';
+import wxRequest from '@/utils/wxRequest';
+import Session from '@/utils/session';
+import Empty from '@/components/empty';
+import StatementItem from '@/components/index/statement';
+import Mine from '@/pages/mine';
+import { getStore } from 'wepy-redux';
+import { asyncList } from '@/store/actions';
+import Tip from '@/utils/tip';
+import Util from '@/utils/util.js';
+//国际化
+import locales from '@/utils/locales';
+import T from '@/utils/wxapp-i18n';
 
-  export default class Index extends wepy.page {
-    config = {
-      navigationBarTitleText: '极简星球记账',
-      "usingComponents": {
-         "i-notice-bar": "../public/iview/notice-bar/index",
-         "i-tab-bar": "../public/iview/tab-bar/index",
-         "i-tab-bar-item": "../public/iview/tab-bar-item/index",
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '极简星球记账',
+    usingComponents: {
+      'i-notice-bar': '../public/iview/notice-bar/index',
+      'i-tab-bar': '../public/iview/tab-bar/index',
+      'i-tab-bar-item': '../public/iview/tab-bar-item/index'
+    }
+  };
+
+  data = {
+    book: '',
+    bookicon: '🔻',
+    bookTypeId: 1,
+    emptyTitle: '本周还没有开始记账哦~',
+    orderEmptyTitle: '无预购清单，点击下方添加一笔吧',
+
+    // list: [ {id: '1', description: '今天很能花', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'},
+    //        {id: '1', description: '雪顶咖啡', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'}  ],
+    list: [],
+    position_2_human_name: '',
+    header: {
+      position_2_amount: '',
+      position_3_human_name: '；  结余：',
+      position_3_amount: ' '
+    },
+    headerTitle: '当月支出',
+    userInfo: true,
+    currentTotal: '',
+    submiting: false,
+    currentPageIndex: 1,
+    hasMoreData: true,
+    isFirstOnShow: true,
+    current: 'homepage',
+    showAuthorise: false,
+    nickName:'点击登陆账户',
+    avatarUrl: 'http://pwu25dhu2.bkt.clouddn.com/no_login_avatar.png',
+  };
+
+  components = {
+    empty: Empty,
+    orderEmpty: Empty,
+    StatementItem,
+    mine: Mine
+  };
+
+  globalData = {
+    user: {}
+  };
+
+  onShow() {
+    this.hasMoreData = true;
+    this.currentPageIndex = 1;
+
+    //会显示授权
+    if (Session.get('login_unauthorized') == 'true') {
+      this.userInfo = true;
+    }
+
+    if (Session.get('index_load_cache1')) {
+      this.list = Session.get('index_load_cache1');
+    }
+
+    // current total
+    if (Session.get('current_total_load_cache')) {
+      var total = Session.get('current_total_load_cache');
+      total = total - 0;
+      this.currentTotal = total.toFixed(1);
+
+      let left = this.header.position_2_amount - this.currentTotal;
+      this.header.position_3_amount = left < 0 ? '' : left.toFixed(1);
+    }
+
+    if (this.isFirstOnShow) {
+      //getUserInfo看是否需要授权
+      this.postUser();
+    }
+    this.updateUI();
+
+    if (Session.get('access') != null) {
+      this.token();
+    }
+    this.isFirstOnShow = false;
+
+    // 数据注入
+    T.registerLocale(locales);
+    try {
+      // 获取系统设置的语言格式
+      var value = wx.getStorageSync('language');
+      if (value) {
+        T.setLocale(value);
+      } else {
+        T.setLocale('zh-hk'); //默认显示繁体
       }
+    } catch (e) {
+      T.setLocale('zh-hk'); //默认显示繁体
     }
+    wx.T = T;
 
-    data = {
-      book: '日常账本',
-      bookTypeId: 1,
-      emptyTitle: '本周还没有开始记账哦~',
-      orderEmptyTitle: '无预购清单，点击下方添加一笔吧',
-     
-      // list: [ {id: '1', description: '今天很能花', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'},
-      //        {id: '1', description: '雪顶咖啡', category: '吃喝', asset: '招商银行', timeStr:'06-24', money: '10.0'}  ],
-      list: [],
-      position_2_human_name: "",
-      header: { position_2_amount: "", position_3_human_name:"；  结余：", position_3_amount: " " },
-      headerTitle:  "当月支出",
+    const _ = wx.T._;
+    this.position_2_human_name = _('Buget');
+    console.log('------time-', _('Time'));
+  }
 
-      userInfo: true,
-      currentTotal: '',
-      submiting: false,
-      currentPageIndex: 1,
-      hasMoreData: true,
-      isFirstOnShow: true,
+  handleChange({ detail }) {
+    this.current = detail.key;
+    this.$apply();
+  }
 
-      current: 'homepage',
+  onPullDownRefresh() {
+    this.hasMoreData = true;
+    this.currentPageIndex = 1;
+    wx.setNavigationBarTitle({
+      title: '刷新中……'
+    }); //动态设置当前页面的标题。
+
+    wx.showNavigationBarLoading(); //在当前页面显示导航条加载动画。
+    this.getList();
+  }
+
+  onShareAppMessage(e) {
+    if (e.from === 'menu') {
+      return {
+        title: '极简星球记账，专为极简主义者准备的记账本',
+        path: '/pages/index',
+        imageUrl: 'http://pwu25dhu2.bkt.clouddn.com/foward.jpeg',
+        success(e) {},
+        fail(e) {},
+        complete() {}
+      };
     }
+  }
 
-    components = {
-      empty: Empty,
-      orderEmpty: Empty,
-      StatementItem,
-      mine: Mine,
-		}
-  
-    globalData = {
-      user: {},
-    }
+  onReachBottom() {
+    this.getMoreList();
+  }
 
-    onShow () {
-      this.hasMoreData = true
-      this.currentPageIndex  = 1
-
-      //会显示授权
-      if (Session.get('login_unauthorized') == 'true' ) {
-         this.userInfo = true   
-      } 
-      
-      if (Session.get('index_load_cache1')) {
-        this.list = Session.get('index_load_cache1')
-      }      
-
-      // current total 
-      if (Session.get('current_total_load_cache')) {
-        var total = Session.get('current_total_load_cache')
-        total = total - 0
-        this.currentTotal = total.toFixed(1)
-
-        let left = this.header.position_2_amount - this.currentTotal
-        this.header.position_3_amount = left < 0 ? "" : left.toFixed(1)
-
-      }
-
-      if ( this.isFirstOnShow ) {
-        //getUserInfo看是否需要授权 
-        this.postUser()  
-      }
-      this.updateUI() 
-
-      if (Session.get('access') != null) {
-         this.token()
-      } 
-      this.isFirstOnShow = false
-
-            // 数据注入
-      T.registerLocale(locales)
-      try {
-        // 获取系统设置的语言格式
-        var value = wx.getStorageSync('language')
-        if (value) {
-          T.setLocale(value)
-        } else {
-          T.setLocale('zh-hk')//默认显示繁体
-        }
-      } catch (e) {
-        T.setLocale('zh-hk')//默认显示繁体
-      }
-      wx.T = T
-
-      console.log('-------', T)
-      const _ = wx.T._ 
-
-      this.position_2_human_name = _('Buget')
-         
-      console.log('------time-', _('Time'))
-    }
-
-    handleChange ({ detail }) {
-        this.current=detail.key
-        this.$apply()
-    }
-
-    onPullDownRefresh() {
-      this.hasMoreData = true
-      this.currentPageIndex  = 1
-      wx.setNavigationBarTitle({
-        title: '刷新中……'
-      })//动态设置当前页面的标题。
-   
-      wx.showNavigationBarLoading();//在当前页面显示导航条加载动画。
-      this.getList()       
-    }
-    
-    onShareAppMessage (e) {
-      if (e.from === 'menu') {
-        return {
-          title: '极简星球记账，专为极简主义者准备的记账本',
-          path: '/pages/index',
-          imageUrl: '../public/images/foward.jpeg',
-          success(e) { },
-          fail(e) { },
-          complete() { }
-        }
-      }
-    }
-    
-    onReachBottom () {
-      this.getMoreList()
-    }
-
-    methods = {
-      gotoCreate () {
-         if (this.current == 'add'){
-            wx.navigateTo({ url: "/pages/statements/create" })
-            this.current == 'homepage'
-            this.$apply()
-         }
-      },
-      gotoPost(){
-        wx.navigateTo({ url: "/pages/statements/images" })
-      },
-      gotoChallenge () {
-        //wx.navigateTo({ url: "/pages/asset" })
-      },
-      gotoBooks () {
-        wx.navigateTo({ url: "/pages/asset" })
-      },
-      getUserInfo (res) {
-        this.userInfo = true
-        if(res.detail.userInfo) {
-          if (this.userInfo) {this.postUser()}
-        }
-      },
-      getPhoneNumber () {
-      },
-      share() {
-        this.onShareAppMessage(1)
-      },
-      async createZero () {
-        var alreadyCreateZero = false
-        const myDate = new Date()
-        let today = myDate.getDate()
-       for (var i = this.list.length - 1; i >= 0; i--) {
-          let date = Util.convertStrToDate(this.list[i].created_at)
-          let day = date.getDate()
-          if (day == today) {
-            if (this.list[i].notes == '今日无消费') {
-               wx.showToast({
-                title: '今日无消费, 太棒了!',
-                icon: 'none',
-                duration: 5000
-               })
-               alreadyCreateZero = true              
-            } 
-            if (this.list[i].amount > 0) {
-              wx.showToast({
-                title: '您今日已经有消费!',
-                icon: 'none',
-                duration: 3000
-               })
-               //alreadyCreateZero = true
-               return
-            }
-         } 
-       }
-       if (alreadyCreateZero == true) {
-        this.onShareAppMessage(1)
-        return
-       }
-       if (this.submitting == true) {
-        return
-       }
-       this.submiting = true
-
-       var bookId = 1
-       if (Session.get('current_book_id')) {
-          bookId = Session.get('current_book_id')
-       }
-
-        wx.showToast({
-                title: '今日无消费, 太棒了!',
-                icon: 'none',
-                duration: 3000
-               })
-
-        const p = {'record_type': 6, 
-                    'amount': 0,
-                    'notes': '今日无消费'}
-        const result = await wxRequest.Post('books/' + bookId + '/records/' , p)
-                      
-        if (result === undefined) {
-          this.submiting = false
-          await tip.confirm('由于网络原因，无法同步账单到服务器，现已临时保存在本地，下次网络正常后系统将自动同步到服务端', {}, '保存失败')
-          Session.pushFailStatement(params)
-          return false
-        }
-        this.getList()
-        this.submiting = false
-        this.onShareAppMessage(1)
-      }
-    }
-
-    updateUI() {
-      var books = []
-      if (Session.get('challenge_load_cache')) {
-         books = Session.get('challenge_load_cache')
-      }
-      var bookId = 1
-      if (Session.get('current_book_id') !== null) {
-         bookId = Session.get('current_book_id')
-      } 
-
-      for (var i = books.length - 1; i >= 0; i--) { 
-        if (books[i]['id'] == bookId) {
-          this.book = books[i]['name']
-          this.bookTypeId = books[i]['book_type_id']
-
-          let current = books[i]['month_to_date_total']
-          if (current != undefined) {
-            this.currentTotal = current 
+  methods = {
+    copy() {
+      var self=this;
+      wx.setClipboardData({
+      data: 'lizlatte',
+      success: function(res) {
+        // self.setData({copyTip:true}),
+        wx.showModal({
+        title: '提示',
+        content: '复制成功',
+        success: function(res) {
+          if (res.confirm) {
+            console.log('确定')
+          } else if (res.cancel) {
+            console.log('取消')
           }
-          this.$apply() 
-          return
+        }
+       })
+       }
+      }); 
+    },
+    gotoCreate() {
+      if (this.current == 'add') {
+        // 查看是否授权
+        var me = this;
+        wx.getSetting({
+          success(res) {
+            console.log('----------', res);
+            if (res.authSetting['scope.userInfo']) {
+              // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+              wx.getUserInfo({
+                success: function(res) {
+                  console.log(res.userInfo);
+                }
+              });
+
+              wx.navigateTo({ url: '/pages/statements/create' });
+              me.current == 'homepage';
+              me.$apply();
+            } else {
+              me.showAuthorise = true;
+              me.$apply();
+              return;
+            }
+          }
+        });
+      }
+    },
+    async submit() {
+      console.log('爸爸page----------');
+        // 查看是否授权
+        var me = this;
+        wx.getSetting({
+          success(res) {
+            console.log('----------', res);
+            if (res.authSetting['scope.userInfo']) {
+
+              getUserInfo()
+
+            } else {
+              me.showAuthorise = true;
+              me.$apply();
+              return;
+            }
+          }
+        });
+    },
+    gotoPost() {
+      wx.navigateTo({ url: '/pages/statements/images' });
+    },
+    gotoChallenge() {
+      //wx.navigateTo({ url: "/pages/asset" })
+    },
+    gotoBooks() {
+      wx.navigateTo({ url: '/pages/asset' });
+    },
+    getUserInfo(res) {
+      if (res.detail.userInfo) {
+        //授权成功  用户点击了同意
+        this.postUser();
+      } else {
+        //授权失败  用户点击了拒绝
+        this.showAuthorise = ture;
+      }
+    },
+    getPhoneNumber() {},
+    share() {
+      this.onShareAppMessage(1);
+    },
+    async createZero() {
+      var alreadyCreateZero = false;
+      const myDate = new Date();
+      let today = myDate.getDate();
+      for (var i = this.list.length - 1; i >= 0; i--) {
+        let date = Util.convertStrToDate(this.list[i].created_at);
+        let day = date.getDate();
+        if (day == today) {
+          if (this.list[i].notes == '今日无消费') {
+            wx.showToast({
+              title: '今日无消费, 太棒了!',
+              icon: 'none',
+              duration: 5000
+            });
+            alreadyCreateZero = true;
+          }
+          if (this.list[i].amount > 0) {
+            wx.showToast({
+              title: '您今日已经有消费!',
+              icon: 'none',
+              duration: 3000
+            });
+            //alreadyCreateZero = true
+            return;
+          }
         }
       }
+      if (alreadyCreateZero == true) {
+        this.onShareAppMessage(1);
+        return;
+      }
+      if (this.submitting == true) {
+        return;
+      }
+      this.submiting = true;
+
+      var bookId = 1;
+      if (Session.get('current_book_id')) {
+        bookId = Session.get('current_book_id');
+      }
+
+      wx.showToast({
+        title: '今日无消费, 太棒了!',
+        icon: 'none',
+        duration: 3000
+      });
+
+      const p = {
+        record_type: 6,
+        amount: 0,
+        notes: '今日无消费'
+      };
+      const result = await wxRequest.Post('books/' + bookId + '/records/', p);
+
+      if (result === undefined) {
+        this.submiting = false;
+        await tip.confirm(
+          '由于网络原因，无法同步账单到服务器，现已临时保存在本地，下次网络正常后系统将自动同步到服务端',
+          {},
+          '保存失败'
+        );
+        Session.pushFailStatement(params);
+        return false;
+      }
+      this.getList();
+      this.submiting = false;
+      this.onShareAppMessage(1);
+    },
+    hideAuthorise() {
+      this.showAuthorise = false;
+      this.$apply();
+    }
+  };
+
+  updateUI() {
+    var books = [];
+    if (Session.get('challenge_load_cache')) {
+      books = Session.get('challenge_load_cache');
+    }
+    var bookId = 1;
+    if (Session.get('current_book_id') !== null) {
+      bookId = Session.get('current_book_id');
     }
 
+    for (var i = books.length - 1; i >= 0; i--) {
+      if (books[i]['id'] == bookId) {
+        this.book = books[i]['name'] + this.bookicon;
+        this.bookTypeId = books[i]['book_type_id'];
 
-    // 预加载用户
-   async postUser() {  
-    const wxLogin =  wepy.login().then((loginResponse) => {
+        let current = books[i]['month_to_date_total'];
+        if (current != undefined) {
+          this.currentTotal = current;
+        }
+        this.$apply();
+        return;
+      }
+    }
+  }
 
-        const wxLogin1 =  wepy.login().then((resp) => {
-          //console.log('2login code record is ++++++++', resp)
-        })
-        wepy.getUserInfo().then((response) => {  
-          this.globalData.user = response.userInfo
-          Session.set('userInfo', response.userInfo)
+  // 预加载用户
+  async postUser() {
+    const wxLogin = wepy.login().then(loginResponse => {
+      const wxLogin1 = wepy.login().then(resp => {
+        //console.log('2login code record is ++++++++', resp)
+      });
+      wepy.getUserInfo().then(
+        response => {
+          this.globalData.user = response.userInfo;
+          Session.set('userInfo', response.userInfo);
 
-          response.userInfo['js_code'] = loginResponse.code
- 
+          response.userInfo['js_code'] = loginResponse.code;
+
           //console.log('getUserInfo ++++++++', response)
 
-          Session.set('login_unauthorized', 'false')
-          this.userInfo = true
-          this.$apply() 
+          Session.set('login_unauthorized', 'false');
+          this.userInfo = true;
+          this.nickName = this.globalData.user['nickName'];
+          this.avatarUrl = this.globalData.user['avatarUrl'];
+          this.$apply();
           //重新登录
           if (Session.get('access') == null) {
-              Tip.loading('加载中...')
-              this.login()
+            Tip.loading('加载中...');
+            this.login();
           }
-      }, (err) => {
-          this.userInfo = false  
-          this.$apply()
-          Session.set('login_unauthorized', 'false')
-      })
-    }) 
+        },
+        err => {
+          this.userInfo = false;
+          this.$apply();
+          Session.set('login_unauthorized', 'false');
+        }
+      );
+    });
   }
 
-    async token() {//检查token是否过期
-      let access = Session.get('access')
-      const result = await wxRequest.Post('token/verify/', { 'token' : access})
-     if (result == undefined) {
-        let refresh = Session.get('refresh')
-        if (refresh == null) {
-
-          this.login()
-
+  async token() {
+    //检查token是否过期
+    let access = Session.get('access');
+    const result = await wxRequest.Post('token/verify/', { token: access });
+    if (result == undefined) {
+      let refresh = Session.get('refresh');
+      if (refresh == null) {
+        this.login();
+      } else {
+        const refreshResult = await wxRequest.Post('token/refresh/', {
+          refresh: refresh
+        });
+        //用refresh换取新的access
+        if (refreshResult == undefined) {
+          this.login();
         } else {
-          const refreshResult = await wxRequest.Post('token/refresh/', { 'refresh' : refresh})
-          //用refresh换取新的access
-          if (refreshResult == undefined) {
-
-             this.login() 
- 
-          } else {
-            Session.set('access', refreshResult.access)
-            this.getChanllengeList()
-          }
-             
-         }
-     } else {
-        this.getChanllengeList()
-     }
-    }
-
-   async login() {
-      var city = this.globalData.user['city']
-      var province = this.globalData.user['province']
-      var country = this.globalData.user['country']
-      var language = this.globalData.user['language']
-      const data = await wxRequest.Post('simple-wechat-login/', {
-                'js_code': this.globalData.user['js_code'],
-                 'avatar_url': this.globalData.user['avatarUrl'],
-                 'nick_name': this.globalData.user['nickName'],
-                 'city': city,
-                 'province': province, 
-                 'country': country,
-                 'gender': this.globalData.user['gender'],
-                 'language': language})
-      if (typeof data != 'undefined') {
-        this.globalData.user = data
-
-          Session.set('access', data.access)
-          Session.set('refresh', data.refresh)
-          
-          //先获取booklist 还没有默认选中的book id，不用getlist
-          this.getChanllengeList()
- 
-      } else {
-         
-
-        Tip.loaded()
+          Session.set('access', refreshResult.access);
+          this.getChanllengeList();
+        }
       }
+    } else {
+      this.getChanllengeList();
+    }
   }
 
-    async getList() {    
-      const store = getStore() 
-      const result = await store.dispatch(asyncList())
-      const res = store.getState().statement.statements   
-      if (res != undefined) {
-        this.list = res.results  
+  async login() {
+    var city = this.globalData.user['city'];
+    var province = this.globalData.user['province'];
+    var country = this.globalData.user['country'];
+    var language = this.globalData.user['language'];
+    const data = await wxRequest.Post('simple-wechat-login/', {
+      js_code: this.globalData.user['js_code'],
+      avatar_url: this.globalData.user['avatarUrl'],
+      nick_name: this.globalData.user['nickName'],
+      city: city,
+      province: province,
+      country: country,
+      gender: this.globalData.user['gender'],
+      language: language
+    });
+    if (typeof data != 'undefined') {
+      this.globalData.user = data;
 
-        if (res.book['book_type_id'] === 2) {
-          this.currentTotal = res.book['month_to_date_total'].toFixed(1)
-          this.headerTitle = '当月支出'
-        }
-        else {
-          this.currentTotal = res.challenge['current_total'].toFixed(1)
-          this.headerTitle = '总支出'
-          this.header.position_2_amount = res.challenge['target_amount']
+      Session.set('access', data.access);
+      Session.set('refresh', data.refresh);
 
-          let left = this.header.position_2_amount - this.currentTotal
-          this.header.position_3_amount = left < 0 ? 0 : left.toFixed(1)
-        }
-        // this.currentTotal = res.challenge['current_total']
-        Session.set('index_load_cache1', res.results)
-      }
-      
-
-      Session.set('current_total_load_cache', this.currentTotal)
-      this.$apply()
-
-      Tip.loaded()
-
-      wx.hideNavigationBarLoading();//隐藏导航条加载动画。
-   
-      wx.stopPullDownRefresh();//停止当前页面下拉刷新。
-      
-      wx.setNavigationBarTitle({
-        title: '极简星球记账'
-      })//动态设置当前页面的标题。
-    }
-
-    async getMoreList() {
-
-      if (this.hasMoreData == false) {
-        return
-      }
-      this.currentPageIndex ++
-      var bookId = 1
-      if (Session.get('current_book_id')) {
-          bookId = Session.get('current_book_id')
-      }      
-      const data = await wxRequest.Get('books/' + bookId + '/records/', {page: this.currentPageIndex })
-      if (typeof data.results == 'undefined') {
-        return
-      }
-      if (data.next == null ){
-        //console.log('data.results.next == null - moredata:', this.hasMoreData)
-        this.hasMoreData = false
-      }
-
-      for (var i = data.results.length - 1; i >= 0; i--) {
-         this.list.push(data.results[i])
-      }
-      this.$apply()
-    }
- 
-    async getChanllengeList() {  
-      const data = await wxRequest.Get('users/self/books/' )
-      if (data == undefined) {
-         self.login()
-      } else {
-        //立刻保存数据，账本list，下面如果是初次使用，默认选择第一个
-        Session.set('challenge_load_cache', data.results)
-
-        // 第一次登录，只有自己的账本，还没有session 
-        let bookid = Session.get('current_book_id')
-        if (bookid == null ) {
-          var id = data.results[0]['id']
-          Session.set('current_book_id', id)
-          console.log('重新登录current_book_id ++++++++++++++++', id)
-         } else {
-          //如果本地有bookid，验证是否合格 
-          let verified = false
-          let book = data.results
-          for (var i = book.length - 1; i >= 0; i--) {
-             if (bookid == book[i].id) {
-                verified = true
-                break
-              }
-          }
-          if (!verified) {
-             var id = data.results[0]['id']
-             Session.set('current_book_id', id)
-          }
-        }
-        //get list
-        this.getList()
-      } 
-      Tip.loaded() 
-      this.updateUI()
-   }
-
-    computed = {
-      showEmpty () {
-        return this.list.length <= 0
-      }
+      //先获取booklist 还没有默认选中的book id，不用getlist
+      this.getChanllengeList();
+    } else {
+      Tip.loaded();
     }
   }
+
+  async getList() {
+    const store = getStore();
+    const result = await store.dispatch(asyncList());
+    const res = store.getState().statement.statements;
+    if (res != undefined) {
+      this.list = res.results;
+
+      if (res.book['book_type_id'] === 2) {
+        this.currentTotal = res.book['month_to_date_total'].toFixed(1);
+        this.headerTitle = '当月支出';
+      } else {
+        this.currentTotal = res.challenge['current_total'].toFixed(1);
+        this.headerTitle = '总支出';
+        this.header.position_2_amount = res.challenge['target_amount'];
+
+        let left = this.header.position_2_amount - this.currentTotal;
+        this.header.position_3_amount = left < 0 ? 0 : left.toFixed(1);
+      }
+      // this.currentTotal = res.challenge['current_total']
+      Session.set('index_load_cache1', res.results);
+    }
+
+    Session.set('current_total_load_cache', this.currentTotal);
+    this.$apply();
+
+    Tip.loaded();
+
+    wx.hideNavigationBarLoading(); //隐藏导航条加载动画。
+
+    wx.stopPullDownRefresh(); //停止当前页面下拉刷新。
+
+    wx.setNavigationBarTitle({
+      title: '极简星球记账'
+    }); //动态设置当前页面的标题。
+  }
+
+  async getMoreList() {
+    if (this.hasMoreData == false) {
+      return;
+    }
+    this.currentPageIndex++;
+    var bookId = 1;
+    if (Session.get('current_book_id')) {
+      bookId = Session.get('current_book_id');
+    }
+    const data = await wxRequest.Get('books/' + bookId + '/records/', {
+      page: this.currentPageIndex
+    });
+    if (typeof data.results == 'undefined') {
+      return;
+    }
+    if (data.next == null) {
+      //console.log('data.results.next == null - moredata:', this.hasMoreData)
+      this.hasMoreData = false;
+    }
+
+    for (var i = data.results.length - 1; i >= 0; i--) {
+      this.list.push(data.results[i]);
+    }
+    this.$apply();
+  }
+
+  async getChanllengeList() {
+    const data = await wxRequest.Get('users/self/books/');
+    if (data == undefined) {
+      self.login();
+    } else {
+      //立刻保存数据，账本list，下面如果是初次使用，默认选择第一个
+      Session.set('challenge_load_cache', data.results);
+
+      // 第一次登录，只有自己的账本，还没有session
+      let bookid = Session.get('current_book_id');
+      if (bookid == null) {
+        var id = data.results[0]['id'];
+        Session.set('current_book_id', id);
+        console.log('重新登录current_book_id ++++++++++++++++', id);
+      } else {
+        //如果本地有bookid，验证是否合格
+        let verified = false;
+        let book = data.results;
+        for (var i = book.length - 1; i >= 0; i--) {
+          if (bookid == book[i].id) {
+            verified = true;
+            break;
+          }
+        }
+        if (!verified) {
+          var id = data.results[0]['id'];
+          Session.set('current_book_id', id);
+        }
+      }
+      //get list
+      this.getList();
+    }
+    Tip.loaded();
+    this.updateUI();
+  }
+
+  computed = {
+    showEmpty() {
+      return this.list.length <= 0;
+    }
+  };
+}
 </script>
 <style lang="scss" src="@/public/styles/index.scss"></style>

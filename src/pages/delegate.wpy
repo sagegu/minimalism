@@ -1,0 +1,36 @@
+<template>
+ 
+    <web-view src="https://mp.weixin.qq.com/s/RPg6kD72KMkYFWSca1ASog"></web-view>
+ 
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import wxRequest from '@/utils/wxRequest'
+  import Host from '@/utils/host'
+  import Session from '@/utils/session'
+  import Tip from '@/utils/tip'
+  export default class CategoryList extends wepy.page {
+    config = {
+      navigationBarTitleText: '极简星球',
+    }
+    components = {
+    }
+
+    data = {
+    }
+
+    onLoad (options) {
+    }
+    
+    onShow () {
+    }
+
+    computed = {
+    }
+
+    methods = {
+    }
+  }
+</script>
+

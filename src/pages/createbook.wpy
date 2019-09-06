@@ -1,0 +1,162 @@
+<template>
+
+  <view class="container">  
+
+    <view class="img">
+      <image  src="http://pwu25dhu2.bkt.clouddn.com/Layer%203.png" mode="heightFix"></image> 
+     </view>
+   <view class="img">
+    <image src="http://pwu25dhu2.bkt.clouddn.com/Layer%202.png"  mode="heightFix"></image> 
+   </view>
+   <view class="img">
+    <image src="http://pwu25dhu2.bkt.clouddn.com/Layer%202.png"  mode="heightFix"></image> 
+   </view>
+   <view class="img">
+    <image src="http://pwu25dhu2.bkt.clouddn.com/Layer%202.png"  mode="heightFix"></image> 
+   </view>
+   <view class="img">
+    <image src="http://pwu25dhu2.bkt.clouddn.com/Layer%202.png"  mode="heightFix"></image> 
+   </view>
+   <view class="img">
+    <image src="http://pwu25dhu2.bkt.clouddn.com/Layer%202.png"  mode="heightFix"></image> 
+   </view>
+    <view class="statement-list">
+     <radio-group bindchange="radioChange" >
+        <repeat  wx:for="{{list}}" wx:key="index" index="index" item="item">
+          <view class="cell">
+            <radio value="{{index}}" checked="{{index == checked}}" class="statement-list-radio"></radio>             
+            <text>  {{ item.credit }}次搜索            ¥{{ item.price }}</text>
+          </view>
+        </repeat>   
+     </radio-group> 
+    </view> 
+
+    <view class="pay-container" @tap="handlePay">
+      <view class="pay">
+            <text class="icon-open-new icon"></text>
+            <text class="svg-demo-text">微信支付</text>   
+      </view>
+    </view>
+
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import wxRequest from '@/utils/wxRequest';
+import Host from '@/utils/host';
+import Session from '@/utils/session';
+import Tip from '@/utils/tip';
+export default class CategoryList extends wepy.page {
+  config = {
+    navigationBarTitleText: '分类管理',
+    usingComponents: {
+      'i-radio-group': '../public/iview/radio-group/index',
+      'i-radio': '../public/iview/radio/index'
+    }
+  };
+  components = {};
+
+  data = {
+    list: [
+      {
+        id: 1,
+        name: '香蕉'
+      },
+      {
+        id: 2,
+        name: '苹果'
+      },
+      {
+        id: 3,
+        name: '西瓜'
+      },
+      {
+        id: 4,
+        name: '葡萄'
+      }
+    ],
+    currentid: '1',
+    position: 'left',
+    animal: '熊猫',
+    checked: false,
+    disabled: false
+  };
+
+  onLoad(options) {
+    if (options.type != undefined) this.type = options.type;
+  }
+
+  onShow() {
+    // this.list = Session.get('pricing')
+    // this.$apply()
+
+    this.requestPricing();
+  }
+
+  computed = {};
+
+  methods = {
+    redirect_url(id) {
+      wx.navigateTo({
+        url: `/pages/categories/child?id=${id}&type=${this.type}`
+      });
+    },
+    handleFruitChange({ detail = {} }) {
+      this.current = detail.value;
+      this.$apply();
+    },
+    radioChange({ detail = {} }) {
+      this.currentid = detail.value;
+      this.$apply();
+    },
+    async handlePay() {
+      const data = await wxRequest.Post('topics/1/orders/', {
+        pricing_id: this.currentid
+      });
+      if (data == undefined) {
+        //  self.login()
+      } else {
+        console.log(data);
+        if (data['status'] == 'ok') {
+          // https://developers.weixin.qq.com/miniprogram/dev/api/open-api/payment/wx.requestPayment.html
+          wx.requestPayment({
+            timeStamp: data['timeStamp'],
+            nonceStr: data['nonceStr'],
+            package: data['package'],
+            signType: 'MD5',
+            paySign: data['paySign'],
+            success: function(res) {
+              console.log('PAID!!');
+              wx.navigateBack({ delta: 1 });
+            },
+            fail: function(res) {
+              console.log('支付失敗');
+            },
+            complete: function(res) {
+              // 接口调用结束的回调函数（调用成功、失败都会执行）
+              console.log('支付完成');
+            }
+          });
+        }
+      }
+      Tip.loaded();
+    }
+  };
+
+  async requestPricing() {
+    const data = await wxRequest.Get('topics/1/pricing');
+    if (data == undefined) {
+      //  self.login()
+    } else {
+      this.list = data.results;
+      Session.set('pricing', data.results);
+      this.$apply();
+    }
+    Tip.loaded();
+    //this.updateUI()
+  }
+}
+</script>
+<style lang="scss" src="@/public/styles/components/pay.scss"></style>
+

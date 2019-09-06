@@ -2,30 +2,33 @@
   <view class="container">
     <view class="header">
        <view class="main-container">
-          <view class="user-section" @tap="redirect('/pages/settings/user_info')">
+          <view class="user-section" @tap="submit" >
             <view class="user">
               <view>
-                <image src="{{ user.avatarUrl }}"></image>
+                <image src="{{ avatarUrl }}"></image>
               </view>
               <view class="user-info">
-                <view style="font-size: 16px">{{ user.name }}</view>
-                <view class="text-grey">{{ sayHello }}</view>
+                <view style="font-size: 16px">{{ title }}</view>
+                <view class="text-grey"> {{ sayHello }}</view>
               </view>
             </view>
           </view>  
 
 
           <view class="body">
-            <view class="cell" @tap="gotoAboutus">
-              <!-- <text>关于我们</text> -->
+            <view class="cell"  @tap="gotoAboutus">
+              <button class="cell-share" >关于我们</button>
+            </view>
+
+            <view class="cell">
               <button class="cell-share" open-type="contact">进入客服会话</button>
             </view>
           
             <view class="cell">
-              <button class="cell-share" open-type="share">推荐给朋友使用</button>
+              <button class="cell-share" open-type="share" >推荐给朋友使用</button>
             </view>
           </view>
-         
+
        </view>
       </view>
     </view>
@@ -42,16 +45,15 @@
       title: {
         type: String,
         default: ''
-      }
-    };
-    data = {
-      user: {
-        name: '访客',
-        bonus_points: 0,
-        avatarUrl: '../public/images/no_login_avatar.png',
-        already_login: true
       },
-      version: ''
+      avatarUrl: {
+        type: String,
+        default: ''
+      },
+    };
+    data = { 
+      version: '',
+      show_notice_bar: true,
     }
 
     computed = {
@@ -77,17 +79,22 @@
     }
 
      onLoad () {
+       console.log('-------on load')
         wx.showShareMenu({
           withShareTicket: true
         }); 
         this.user = Session.get('userInfo')
+        //this.nickName = this.user['nickName'];
         this.$apply()
-        console.log('-----yhghhy',this.user)
      }
-
+     
     methods = {
+      submit() {
+       // this.onShareAppMessage('menu')
+         this.$emit('submit')
+      },
       gotoAboutus () {
-        //wx.navigateTo({ url: "/pages/statements/create" })
+        wx.navigateTo({ url: "/pages/delegate" })
       },
     }
      

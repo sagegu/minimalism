@@ -21,6 +21,7 @@
 	"appid": "wx5ab1b37e36cf12eb",
 	"projectname": "minimalism",
 	"miniprogramRoot": "dist/",
+	"cloudfunctionRoot": "cloudfunctions/",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
 	"condition": {}

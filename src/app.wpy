@@ -14,10 +14,12 @@ export default class extends wepy.app {
   config = {
     pages: [
       "pages/index",
+      "pages/createbook",
       "pages/chart",
-      "pages/asset",
       "pages/setting",
-
+      "pages/delegate",
+      "pages/asset",
+ 
       // 记一笔
       "pages/statements/create",
       "pages/statements/edit",
@@ -25,6 +27,8 @@ export default class extends wepy.app {
       "pages/statements/chose_category",
       "pages/statements/chose_asset",
       // "pages/statements/filter_statements",
+
+      "pages/book/create_book",
 
       // 余额设置
        "pages/forms/asset_form",
@@ -50,13 +54,10 @@ export default class extends wepy.app {
       "pages/statements/images",
       
       // 编辑账单类型分类/资产分类
-      "pages/categories/list",
-      "pages/categories/child",
-      "pages/categories/category_form",
-      "pages/categories/category_statement",
-
-      "pages/book/create_book",
-      "pages/book/form",
+      // "pages/categories/list",
+      // "pages/categories/child",
+      // "pages/categories/category_form",
+      // "pages/categories/category_statement",
 
       
       // 消息

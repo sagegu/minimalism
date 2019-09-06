@@ -34,9 +34,9 @@
     </view>
   </view>
 
-  <view class="pay"> 
-    <!--   <button  @tap="create" class="left">创建账本</button> -->
-  </view>
+  <!-- <view class="pay"> 
+      <button  @tap="create" class="left">创建账本</button>
+  </view> -->
 
 </view>
 </template>

@@ -1,7 +1,16 @@
 <template lang="wxml">
   <view class="container">
-     
-    
+   <!--  <i-tabs current="{{ current }}" bindchange="handleChange">
+      <i-tab key="expend" title="支出"></i-tab>
+      <i-tab key="income" title="收入"></i-tab>
+      <i-tab key="transfer" title="转账"></i-tab>
+      <i-tab key="repayment" title="还款"></i-tab>
+    </i-tabs> -->
+        <!-- <web-view src="https://mp.weixin.qq.com/s?__biz=MzA4NjQ3NTMxMQ==&tempkey=MTAyM19rOFdjYWhmTGMvTTdxTkhzcVRGb1VzZU0wNHJWRUdMRWlQX3BjQWJ0emxUbXJfVDdGekp4b0RFdGk4WkpVbGRFRWpHY05pSV9mQk0yMXRLeUhfYnZreDRDWm1lSlh2ZlBWTVZSX1dyVjJRUnFHMEhJN19DZVhMQ3RjN0FWVEtMZ1ZPTTdZMGh5T256NHh2NldpT0haU3hlOEpsYXgyUUhub0I1OW53fn4%3D&chksm=07c3f22030b47b36c70724219de3ba9c7610634141d61a5bc53dcd9fdfe3528b945d4f4b486d&scene=90&xtrack=1&previewkey=kiHYF4Bu8xIhbN7et8qDycc2LCzidIVXFV95LKkbHHY%253D&sessionid=1566804616&subscene=93#wechat_redirect"></web-view> -->
+        <!-- <web-view src="https://www.wenjuan.in/s/eiM3In1/"></web-view> -->
+        <image src="http://pwu25dhu2.bkt.clouddn.com/Layer%203.png"></image>
+
+
     <view class="comonent-list">
       <Expend
         :submiting.sync="submiting"
@@ -9,7 +18,31 @@
         @submit.user="submit"
         wx:if="{{ current == 'expend' }}"
       />
-      
+
+     <!--  <Income
+        :submiting.sync="submiting"
+        :type="income"
+        @submit.user="submit"
+        wx:if="{{ current == 'income' }}"
+      />
+
+      <Transfer
+        :submiting.sync="submiting"
+        :statement.sync="transferData"
+        @submit.user="submit"
+        wx:if="{{ current == 'transfer' }}"
+      />
+
+      <Repayment
+        :submiting.sync="submiting"
+        :statement.sync="repayData"
+        @submit.user="submit"
+        wx:if="{{ current == 'repayment' }}"
+      />
+
+      <PayForOther
+        wx:if="{{ current == 'payForOther' }}"
+      /> -->
     </view>
 
   </view>
@@ -18,7 +51,7 @@
 <script>
   import wepy from 'wepy'
   import wxRequest from '@/utils/wxRequest'
-  import StatementForm from '@/pages/book/form'
+  import StatementForm from '@/components/statement/book_form'
   import Transfer from '@/components/statement/transfer'
   import Repayment from '@/components/statement/repayment'
   import PayForOther from '@/components/statement/pay_for_other'
@@ -28,7 +61,7 @@
   import Util from '@/utils/util.js'
   import Session from '@/utils/session'
 
-  export default class StatementCreate extends wepy.page {
+  export default class BookCreate extends wepy.page {
     config = {
       navigationBarTitleText: '记一笔',
       "usingComponents": {
@@ -81,7 +114,12 @@
     }
 
     onLoad(params) {
-      
+      // 直接显示转账的界面
+      if (typeof params.type !== 'undefined' && params.type === 'transfer') {
+        this.current = params.type
+        this.transferData.source = params.source
+        this.transferData.from = params.asset_id
+      }
     }
 
     methods = {

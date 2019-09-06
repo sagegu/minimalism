@@ -1,0 +1,77 @@
+
+
+
+@import '../_variable.scss';
+page, .container{
+  height: 100%;
+}
+.container {
+  > view {
+    width: 100%;
+    display: block;
+    background-color:transparent;
+  }
+
+  > .img {
+    width: 100%;
+    //border: 1px solid black;
+    background-color:transparent;
+   //margin-right: 1em;
+    display:flex;                    //flex布局
+    justify-content: center;         //水平轴线居中
+    > image {
+      width: 100%;
+    }
+  }
+}
+.statement-list {
+  background:transparent;
+  margin-left: 42rpx;
+  margin-bottom: 20rpx;
+}
+
+.pay-container {
+  
+  position: fixed;
+  bottom: 0rpx;
+  width: 100%;
+  height: 145rpx;
+  font-size: 32rpx;
+  background: white;
+  justify-content: space-between;
+  display: fixed;
+
+  display: flex;
+  justify-content: center; 
+  width: 100%;
+  .pay {
+    position: fixed;
+    right:0rpx;
+    bottom:0rpx;
+    left:0rpx;
+    line-height: 80rpx;
+    background-color: white;
+    width: 260rpx;
+    height: 100rpx;
+    justify-content: center; 
+    display: flex;
+    align-items: center;
+    background-image: url("http://pww0da79m.bkt.clouddn.com/btnpay.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
+  .svg-demo-text {
+    color: #888896;
+    font-size: 26rpx; 
+  } 	  
+  .icon-open-new {
+    background-image: url("http://pww0da79m.bkt.clouddn.com/me.png");
+    background-size: cover;
+  } 	   
+  .icon {
+    display: inline-block;
+    width: 50rpx;
+    height: 50rpx;
+  }
+  
+ }
